@@ -58,14 +58,14 @@ export default function InvitationPage({ eventId, eventName, eventDate, location
           <div className="wedding-panel rounded-[2rem] p-6 text-center">
             <Portrait src={content.groomPhoto} /><p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b98b5a]">Mempelai pria</p>
             <h2 className="mt-3 font-serif text-4xl">{content.groomName || "Mempelai pria"}</h2>
-            <p className="mt-3 text-sm leading-6 text-[#756d67]">{content.groomRole || "Putra"} dari Bapak {content.groomFather || "—"} dan Ibu {content.groomMother || "—"}</p>
+            {(content.groomFather || content.groomMother) && <p className="mt-3 text-sm leading-6 text-[#756d67]">{content.groomRole || "Putra"} dari {content.groomFather && `Bapak ${content.groomFather}`}{content.groomFather && content.groomMother && " dan "}{content.groomMother && `Ibu ${content.groomMother}`}</p>}
             <TextBlock value={content.groomAddress} />
           </div>
           <span className="mx-auto font-serif text-5xl italic text-[#b98b5a]">&amp;</span>
           <div className="wedding-panel rounded-[2rem] p-6 text-center">
             <Portrait src={content.bridePhoto} /><p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b98b5a]">Mempelai wanita</p>
             <h2 className="mt-3 font-serif text-4xl">{content.brideName || "Mempelai wanita"}</h2>
-            <p className="mt-3 text-sm leading-6 text-[#756d67]">{content.brideRole || "Putri"} dari Bapak {content.brideFather || "—"} dan Ibu {content.brideMother || "—"}</p>
+            {(content.brideFather || content.brideMother) && <p className="mt-3 text-sm leading-6 text-[#756d67]">{content.brideRole || "Putri"} dari {content.brideFather && `Bapak ${content.brideFather}`}{content.brideFather && content.brideMother && " dan "}{content.brideMother && `Ibu ${content.brideMother}`}</p>}
             <TextBlock value={content.brideAddress} />
           </div>
         </section>
