@@ -58,6 +58,10 @@ export async function getGuestEvent(slug?: string): Promise<GuestExperienceProps
     videoDuration: event.videoDuration,
     allowVoiceNote: event.allowVoiceNote,
     voiceNoteDuration: event.voiceNoteDuration,
-    invitation: mergeInvitationContent(event.invitation?.data),
+    invitation: {
+      ...mergeInvitationContent(event.invitation?.data),
+      dateLabel: event.date.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }),
+      location: event.location ?? "",
+    },
   };
 }

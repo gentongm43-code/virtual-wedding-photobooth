@@ -18,6 +18,7 @@ const tabs: { id: Tab; label: string }[] = [
 
 const inputClass = "mt-1.5 w-full rounded-xl border border-[#e3d8cf] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#b99261]";
 const labelClass = "block text-[13px] font-medium text-[#5f554e]";
+const cleanValue = (value?: string) => { const text = value ?? ""; return text.includes("picsum.photos") || /assets\/images\/(cowo|cewe)\.webp$/.test(text) ? "" : text; };
 
 const groups: { title: string; keys: string[] }[] = [
   { title: "Cover & sambutan", keys: ["weddingTitle", "coupleName", "quote", "dateLabel", "guestMessage"] },
@@ -124,7 +125,7 @@ export default function EventForm({ templates, initial }: { templates: TemplateO
                       {field.type === "textarea" ? (
                         <textarea name={`invitation_${key}`} defaultValue={invitation[key] ?? ""} rows={3} className={inputClass} />
                       ) : (
-                        <input name={`invitation_${key}`} type={field.type} defaultValue={invitation[key] ?? ""} className={inputClass} />
+                        <input name={`invitation_${key}`} type={field.type} defaultValue={cleanValue(invitation[key])} placeholder={field.type === "url" ? "https://... (kosongkan jika tidak dipakai)" : undefined} className={inputClass} />
                       )}
                     </label>
                   );
