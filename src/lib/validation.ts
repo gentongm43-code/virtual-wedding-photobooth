@@ -15,7 +15,7 @@ export const eventSchema = z.object({
   logo: z.string().trim().max(2000).optional().or(z.literal("")),
   primaryColor: z.string().trim().regex(/^#[0-9a-f]{6}$/i).optional().or(z.literal("")),
   secondaryColor: z.string().trim().regex(/^#[0-9a-f]{6}$/i).optional().or(z.literal("")),
-  templateId: z.string().cuid().optional().or(z.literal("")),
+  templateId: z.string().trim().max(100).optional().or(z.literal("")),
   photoLimit: z.coerce.number().int().min(1).max(4),
   allowVideo: checkbox(true),
   videoDuration: z.coerce.number().int().min(1).max(300).default(30),
