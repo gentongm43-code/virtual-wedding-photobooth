@@ -32,6 +32,14 @@ const groups: { title: string; keys: string[] }[] = [
   { title: "Musik & penutup", keys: ["audioUrl", "closingMessage"] },
 ];
 
+const urlHints: Record<string, string> = {
+  groomPhoto: "Contoh: https://link-foto-mempelai-pria.jpg (boleh dikosongkan)",
+  bridePhoto: "Contoh: https://link-foto-mempelai-wanita.jpg (boleh dikosongkan)",
+  mapUrl: "Contoh: https://maps.app.goo.gl/xxxx (boleh dikosongkan)",
+  audioUrl: "Contoh: https://link-musik.mp3 (boleh dikosongkan)",
+};
+const urlHint = (key: string) => urlHints[key] ?? (key.startsWith("gallery") ? "Contoh: https://link-foto-galeri.jpg (boleh dikosongkan)" : "https://... (boleh dikosongkan)");
+
 const fieldMap = new Map<string, { label: string; type: string }>(
   invitationFields.map(([key, label, type]) => [key as string, { label: label as string, type: type as string }]),
 );
@@ -108,7 +116,7 @@ export default function EventForm({ templates, initial }: { templates: TemplateO
       <div data-tab="undangan" hidden={tab !== "undangan"} className="mt-5 space-y-2.5">
         <p className="px-1 text-xs text-[#9a8d83]">Ketuk bagian untuk membuka dan mengedit isinya.</p>
         {allGroups.map(({ title, keys }, index) => {
-          const filled = keys.filter((key) => invitation[key]).length;
+          const filled = keys.filter((key) => cleanValue(invitation[key]).trim()).length;
           return (
             <details key={title} open={index === 0 || undefined} className="group rounded-2xl border border-[#eee3d9] bg-[#fffdfa]">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5 [&::-webkit-details-marker]:hidden">
@@ -123,9 +131,9 @@ export default function EventForm({ templates, initial }: { templates: TemplateO
                     <label key={key} className={`${labelClass} ${field.type === "textarea" ? "sm:col-span-2" : ""}`}>
                       {field.label}
                       {field.type === "textarea" ? (
-                        <textarea name={`invitation_${key}`} defaultValue={invitation[key] ?? ""} rows={3} className={inputClass} />
+                        <textarea name={`invitation_${key}`} defaultValue={invitation[key] ?? ""} rows={3} placeholder="Opsional" className={inputClass} />
                       ) : (
-                        <input name={`invitation_${key}`} type={field.type} defaultValue={cleanValue(invitation[key])} placeholder={field.type === "url" ? "https://... (kosongkan jika tidak dipakai)" : undefined} className={inputClass} />
+                        <input name={`invitation_${key}`} type={field.type === "url" ? "text" : field.type} inputMode={field.type === "url" ? "url" : undefined} defaultValue={cleanValue(invitation[key])} placeholder={field.type === "url" ? urlHint(key) : "Opsional"} className={inputClass} />
                       )}
                     </label>
                   );
