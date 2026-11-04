@@ -36,7 +36,7 @@ async function getFrames(): Promise<PreviewTemplate[]> {
 export async function getGuestEvent(slug?: string): Promise<GuestExperienceProps | null> {
   const event = await withDatabaseRetry(() => slug
     ? prisma.event.findUnique({ where: { slug }, include: { invitation: true } })
-    : prisma.event.findFirst({ where: { active: true }, orderBy: { createdAt: "asc" }, include: { invitation: true } }));
+    : prisma.event.findFirst({ where: { active: true }, orderBy: { updatedAt: "desc" }, include: { invitation: true } }));
 
   if (!event || !event.active) return null;
 
