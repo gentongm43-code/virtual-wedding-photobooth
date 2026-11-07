@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { Download, Share2 } from "lucide-react";
 import type { PreviewTemplate } from "./photo-preview";
-import { configFromTemplateRecord, normalizeTemplate, resolveTemplateText } from "@/lib/image/template-config";
+import { configFromTemplateRecord, fitTemplateText, normalizeTemplate, resolveTemplateText } from "@/lib/image/template-config";
 import { getPhotoFilterCss, type PhotoFilter } from "@/lib/image/photo-filter";
 
 type Shot = { blob: Blob; filter: PhotoFilter };
@@ -67,10 +67,13 @@ async function buildFrame(p: Props) {
   }
   const vars = { eventName: p.eventName, eventDate: p.eventDate, location: p.location ?? "" };
   for (const item of texts) {
+    const resolved = resolveTemplateText(item.text, vars);
+    const fit = fitTemplateText(item, resolved, width);
     ctx.fillStyle = item.color ?? "#332b27";
-    ctx.font = `600 ${item.fontSize ?? 32}px ${item.fontFamily ?? "Arial"}`;
-    ctx.textAlign = item.align === "left" ? "left" : item.align === "right" ? "right" : "center";
-    ctx.fillText(resolveTemplateText(item.text, vars), item.x, item.y);
+    ctx.font = `600 ${fit.fontSize}px ${item.fontFamily ?? "Arial"}`;
+    ctx.textAlign = fit.align === "left" ? "left" : fit.align === "right" ? "right" : "center";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText(resolved, item.x, item.y);
   }
   if (overlay) ctx.drawImage(overlay, 0, 0, width, height);
   return canvas;
@@ -124,19 +127,21 @@ function save(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
+function detectCanShare() {
+  try {
+    const f = new File([new Blob(["x"], { type: "image/jpeg" })], "a.jpg", { type: "image/jpeg" });
+    return Boolean(navigator.canShare?.({ files: [f] }));
+  } catch {
+    return false;
+  }
+}
+
+const subscribeNoop = () => () => {};
+
 export default function StoryActions(props: Props) {
-  const [canShare, setCanShare] = useState(false);
+  const canShare = useSyncExternalStore(subscribeNoop, detectCanShare, () => false);
   const [busy, setBusy] = useState("");
   const [msg, setMsg] = useState("");
-
-  useEffect(() => {
-    try {
-      const f = new File([new Blob(["x"], { type: "image/jpeg" })], "a.jpg", { type: "image/jpeg" });
-      setCanShare(Boolean(navigator.canShare?.({ files: [f] })));
-    } catch {
-      setCanShare(false);
-    }
-  }, []);
 
   const base = props.eventName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "foto";
 

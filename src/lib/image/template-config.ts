@@ -117,3 +117,17 @@ export function resolveTemplateText(text: string, variables: { eventName: string
     .replaceAll("{{eventDate}}", variables.eventDate)
     .replaceAll("{{location}}", variables.location);
 }
+
+export function fitTemplateText(item: TemplateText, text: string, templateWidth: number) {
+  const align = item.align ?? "center";
+  const floor = templateWidth * 0.024;
+  const base = Math.max(item.fontSize ?? 32, floor);
+  const margin = templateWidth * 0.06;
+  const room =
+    align === "left" ? templateWidth - item.x - margin
+    : align === "right" ? item.x - margin
+    : 2 * (Math.min(item.x, templateWidth - item.x) - margin);
+  const estimated = Math.max(1, text.length) * base * 0.58;
+  const fontSize = estimated > room && room > 0 ? Math.max(base * 0.5, (base * room) / estimated) : base;
+  return { fontSize: Math.round(fontSize * 10) / 10, align };
+}

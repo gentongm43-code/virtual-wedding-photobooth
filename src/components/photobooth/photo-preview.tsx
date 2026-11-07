@@ -5,6 +5,7 @@
 import type { CSSProperties } from "react";
 import {
   configFromTemplateRecord,
+  fitTemplateText,
   normalizeTemplate,
   resolveTemplateText,
   type TemplateText,
@@ -53,7 +54,13 @@ export function PhotoPreview({
       return area ? <img key={`${url}-${index}`} src={url} alt="" className="absolute object-cover" style={{ left: `${(area.x / width) * 100}%`, top: `${(area.y / height) * 100}%`, width: `${(area.width / width) * 100}%`, height: `${(area.height / height) * 100}%`, filter: imageFilter }} /> : null;
     })}
     {config.logo && <img src={config.logo} alt="" className="absolute left-1/2 top-[1.5%] max-h-[12%] max-w-[80%] -translate-x-1/2 object-contain" />}
-    {texts.map((item, index) => <span key={`${item.text}-${index}`} className="absolute whitespace-nowrap font-semibold" style={{ left: `${(item.x / width) * 100}%`, top: `${(item.y / height) * 100}%`, transform: `${item.align === "left" ? "translate(0, -100%)" : item.align === "right" ? "translate(-100%, -100%)" : "translate(-50%, -100%)"}`, color: item.color ?? "#332b27", fontFamily: item.fontFamily ?? "Arial", fontSize: `${(item.fontSize ?? 32) / width * 100}cqw`, textAlign: item.align ?? "center" }}>{resolveTemplateText(item.text, variables)}</span>)}
+    <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full">
+      {texts.map((item, index) => {
+        const resolved = resolveTemplateText(item.text, variables);
+        const fit = fitTemplateText(item, resolved, width);
+        return <text key={`${item.text}-${index}`} x={item.x} y={item.y} textAnchor={fit.align === "left" ? "start" : fit.align === "right" ? "end" : "middle"} fill={item.color ?? "#332b27"} fontFamily={item.fontFamily ?? "Arial"} fontSize={fit.fontSize} fontWeight={600}>{resolved}</text>;
+      })}
+    </svg>
     {config.overlay && <img src={config.overlay} alt="" className="absolute inset-0 h-full w-full object-fill" />}
   </div>;
 }

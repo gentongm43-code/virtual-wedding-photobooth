@@ -50,7 +50,7 @@ function mimeFor(mode: "video" | "voice") {
   }) ?? "";
 }
 
-async function createBoomerangVideo(blob: Blob): Promise<{ blob: Blob; mimeType: string; durationMs: number }> {
+async function createBoomerangVideo(blob: Blob, knownSeconds: number): Promise<{ blob: Blob; mimeType: string; durationMs: number }> {
   if (typeof MediaRecorder === "undefined" || typeof HTMLCanvasElement === "undefined") {
     throw new Error("Boomerang tidak didukung di browser ini.");
   }
@@ -71,7 +71,8 @@ async function createBoomerangVideo(blob: Blob): Promise<{ blob: Blob; mimeType:
       source.onerror = () => reject(new Error("Gagal memuat video untuk boomerang."));
     });
 
-    if (!Number.isFinite(source.duration) || source.duration <= 0) {
+    const sourceSeconds = Number.isFinite(source.duration) && source.duration > 0 ? source.duration : knownSeconds;
+    if (!Number.isFinite(sourceSeconds) || sourceSeconds <= 0) {
       throw new Error("Durasi video tidak valid.");
     }
 
@@ -86,7 +87,7 @@ async function createBoomerangVideo(blob: Blob): Promise<{ blob: Blob; mimeType:
     const stream = canvas.captureStream(30);
     const recorder = new MediaRecorder(stream, { mimeType });
     const chunks: Blob[] = [];
-    const totalSeconds = Math.min(Math.max(source.duration * 2, 1.5), 6);
+    const totalSeconds = Math.max(sourceSeconds * 2, 1.5);
     const startTime = performance.now();
 
     const finalResult = await new Promise<{ blob: Blob; durationMs: number }>((resolve, reject) => {
@@ -107,7 +108,7 @@ async function createBoomerangVideo(blob: Blob): Promise<{ blob: Blob; mimeType:
           return;
         }
 
-        const playhead = elapsed <= source.duration ? elapsed : totalSeconds - elapsed;
+        const playhead = elapsed <= sourceSeconds ? elapsed : Math.max(0, totalSeconds - elapsed);
         if (Math.abs(source.currentTime - playhead) > 0.08) source.currentTime = playhead;
         context.drawImage(source, 0, 0, canvas.width, canvas.height);
         requestAnimationFrame(render);
@@ -128,14 +129,18 @@ async function createBoomerangVideo(blob: Blob): Promise<{ blob: Blob; mimeType:
   }
 }
 
-import { useEffect as useEffectSafe } from "react";
-
 function SuccessPhoto({ photos, template, eventName, eventDate, location }: { photos: { blob: Blob }[]; template: Parameters<typeof PhotoPreview>[0]["template"]; eventName: string; eventDate: string; location?: string | null }) {
   const [urls, setUrls] = useState<string[]>([]);
-  useEffectSafe(() => {
+  useEffect(() => {
+    let cancelled = false;
     const made = photos.map((photo) => URL.createObjectURL(photo.blob));
-    setUrls(made);
-    return () => made.forEach((url) => URL.revokeObjectURL(url));
+    queueMicrotask(() => {
+      if (!cancelled) setUrls(made);
+    });
+    return () => {
+      cancelled = true;
+      made.forEach((url) => URL.revokeObjectURL(url));
+    };
   }, [photos]);
   if (!urls.length) return null;
   return <PhotoPreview photoUrls={urls} template={template} eventName={eventName} eventDate={eventDate} location={location} />;
@@ -184,8 +189,11 @@ export default function GuestMediaPanel({
   const timerRef = useRef<number | null>(null);
   const itemsRef = useRef<Item[]>([]);
 
+  const boomerangSeconds = Math.max(1, Math.min(3, Math.floor(videoDuration / 2)));
+  const videoLimit = videoCaptureMode === "boomerang" ? boomerangSeconds : videoDuration;
+
   const options: { mode: Mode; label: string; description: string; enabled: boolean }[] = [
-    { mode: "video", label: "Video", description: `Maks. ${videoDuration} detik`, enabled: allowVideo },
+    { mode: "video", label: "Video", description: `Maks. ${videoLimit} detik`, enabled: allowVideo },
     { mode: "voice", label: "Voice note", description: `Maks. ${voiceNoteDuration} detik`, enabled: allowVoiceNote },
     { mode: "text", label: "Text", description: "Ucapan tertulis", enabled: allowMessage },
   ];
@@ -272,7 +280,8 @@ export default function GuestMediaPanel({
         setRecording(false);
         setRecordingMode(null);
         recorderRef.current = null;
-        const durationMs = Math.max(1, Date.now() - startedRef.current);
+        const limitSeconds = mode === "video" ? videoLimit : voiceNoteDuration;
+        const durationMs = Math.min(Math.max(1, Date.now() - startedRef.current), limitSeconds * 1000);
         const baseBlob = new Blob(chunksRef.current, { type: mimeType });
 
         void (async () => {
@@ -282,7 +291,7 @@ export default function GuestMediaPanel({
             let finalDurationMs = durationMs;
 
             if (mode === "video" && videoCaptureMode === "boomerang") {
-              const boomerang = await createBoomerangVideo(baseBlob);
+              const boomerang = await createBoomerangVideo(baseBlob, durationMs / 1000);
               finalBlob = boomerang.blob;
               finalMimeType = boomerang.mimeType;
               finalDurationMs = boomerang.durationMs;
@@ -296,12 +305,12 @@ export default function GuestMediaPanel({
         })();
       };
       recorder.start(250);
-      const maxSeconds = mode === "video" ? videoDuration : voiceNoteDuration;
+      const maxSeconds = mode === "video" ? videoLimit : voiceNoteDuration;
       timerRef.current = window.setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startedRef.current) / 1000);
-        setSeconds(elapsed);
-        if (elapsed >= maxSeconds && recorder.state === "recording") recorder.stop();
-      }, 250);
+        const elapsedMs = Date.now() - startedRef.current;
+        setSeconds(Math.min(maxSeconds, Math.floor(elapsedMs / 1000)));
+        if (elapsedMs >= maxSeconds * 1000 && recorder.state === "recording") recorder.stop();
+      }, 100);
     }).catch((reason: unknown) => {
       setError(reason instanceof Error && reason.message === "timeout"
         ? "Perangkat tidak merespons dalam 12 detik."
@@ -434,7 +443,7 @@ export default function GuestMediaPanel({
           {activeMode === "text" ? <><input value={guestName} onChange={(event) => setGuestName(event.target.value)} maxLength={100} placeholder="Nama (opsional)" className="mb-3 w-full border-b border-[#d5dde9] pb-2 outline-none" /><textarea value={text} onChange={(event) => setText(event.target.value)} rows={5} maxLength={500} placeholder="Tuliskan ucapan untuk kedua mempelai..." className="w-full resize-none outline-none" /><p className="mt-2 text-right text-xs text-[#5a6c8c]">{text.length} / 500</p></> : activeItem?.recording ? <div className="flex items-center justify-between text-sm font-semibold"><span>{activeOption?.label} siap direview</span><button type="button" onClick={() => startRecording(activeMode)} className="text-[#5a6c8c]">Rekam lagi</button></div> : <button type="button" onClick={() => startRecording(activeMode)} className="flex w-full items-center gap-3 text-left font-semibold">{activeMode === "video" ? <Video size={19} /> : <Mic size={19} />} Rekam {activeOption?.label}</button>}
         </div>}
         {recordingMode === "video" && recording && <video ref={livePreviewRef} autoPlay muted playsInline className="mt-4 max-h-64 w-full rounded-xl bg-black object-contain" />}
-        {recording && <div className="mt-5 rounded-[1.5rem] bg-[#1c3359] p-5 text-center text-sm font-semibold text-white shadow-lg"><div className="flex items-center justify-center gap-2 text-xs uppercase tracking-[0.2em] text-[#e9eff7]"><span className="guest-pulse h-2.5 w-2.5 rounded-full bg-red-400" /> REC</div><div className="mt-3 font-serif text-3xl">{String(seconds).padStart(2, "0")}s <span className="text-sm font-sans text-white/45">/ {recordingMode === "video" ? videoDuration : voiceNoteDuration}s</span></div><div className="mt-4 flex h-8 items-center justify-center gap-1">{Array.from({ length: 18 }, (_, index) => <span key={index} className="w-1 rounded-full bg-[#e9eff7]" style={{ height: `${10 + ((index * 7) % 20)}px` }} />)}</div><button type="button" onClick={stopRecording} className="mt-4 min-h-12 rounded-full bg-white px-8 text-sm font-semibold text-[#1c3359] active:scale-95">Stop</button></div>}
+        {recording && <div className="mt-5 rounded-[1.5rem] bg-[#1c3359] p-5 text-center text-sm font-semibold text-white shadow-lg"><div className="flex items-center justify-center gap-2 text-xs uppercase tracking-[0.2em] text-[#e9eff7]"><span className="guest-pulse h-2.5 w-2.5 rounded-full bg-red-400" /> REC</div><div className="mt-3 font-serif text-3xl">{String(seconds).padStart(2, "0")}s <span className="text-sm font-sans text-white/45">/ {recordingMode === "video" ? videoLimit : voiceNoteDuration}s</span></div><div className="mt-4 flex h-8 items-center justify-center gap-1">{Array.from({ length: 18 }, (_, index) => <span key={index} className="w-1 rounded-full bg-[#e9eff7]" style={{ height: `${10 + ((index * 7) % 20)}px` }} />)}</div><button type="button" onClick={stopRecording} className="mt-4 min-h-12 rounded-full bg-white px-8 text-sm font-semibold text-[#1c3359] active:scale-95">Stop</button></div>}
         {stage === "compose" && <GuestButton type="button" disabled={recording} onClick={continueCurrent} className="mt-8 w-full">{activeMode === "text" || activeIndex === selectedModes.length - 1 ? "Tinjau semua" : "Berikutnya"}</GuestButton>}
         {(stage === "review" || stage === "sending") && <><div className="mt-8 grid gap-4">{pendingPhotos.map((photo) => <div key={photo.id} className={`rounded-[1.5rem] border p-3 shadow-sm ${failedPhotos.includes(photo.id) ? "border-red-300 bg-red-50" : "border-[#d5dde9] bg-white"}`}><PhotoPreview photoUrl={photo.url} template={selectedTemplate} eventName={eventName} eventDate={eventDate} location={location} imageFilter={photo.filter ? getPhotoFilterCss(photo.filter) : "none"} /><p className="mt-2 text-xs text-[#5a6c8c]">{uploadedPhotos.includes(photo.id) ? "Siap dikirim" : failedPhotos.includes(photo.id) ? "Gagal dikirim" : "Menunggu dikirim"}</p></div>)}{items.map((item) => <div key={item.mode} className={`rounded-[1.5rem] border p-5 shadow-sm ${failed.includes(item.mode) ? "border-red-300 bg-red-50" : "border-[#d5dde9] bg-white"}`}>{item.mode === "text" ? <><p className="font-serif text-xl leading-8">“{item.text}”</p>{guestName && <p className="mt-3 text-xs text-[#5a6c8c]">— {guestName}</p>}</> : item.recording && <>{item.mode === "video" ? <video controls playsInline src={item.recording.url} className="max-h-56 w-full rounded-xl bg-black object-contain" /> : <audio controls src={item.recording.url} className="w-full" />}<p className="mt-3 text-xs text-[#5a6c8c]">{failed.includes(item.mode) ? "Gagal dikirim" : "Siap dikirim"}</p></>}</div>)}</div>{error && <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}<button type="button" disabled={stage === "sending"} onClick={() => void sendAll()} className="mt-8 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#1c3359] px-5 py-4 font-semibold text-white disabled:opacity-50">{stage === "sending" ? "Mengirim..." : failed.length || failedPhotos.length ? <><RefreshCw size={17} /> Kirim ulang yang gagal</> : <><Send size={17} /> Kirim Semua</>}</button></>}
         {error && stage === "compose" && <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
