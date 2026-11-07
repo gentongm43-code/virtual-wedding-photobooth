@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Javanese:wght@400;600&display=swap");
 @import "tailwindcss";
 
 :root {
@@ -15,7 +15,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: "DM Sans", sans-serif;
-  --font-serif: "Playfair Display", serif;
+  --font-serif: "Cormorant Garamond", "Playfair Display", serif;
 }
 
 * { box-sizing: border-box; }
@@ -31,7 +31,7 @@ a { text-decoration: none; }
   background:
     linear-gradient(180deg, rgba(248, 238, 227, 0.9), rgba(248, 238, 227, 0.98)),
     radial-gradient(circle at 12% 8%, rgba(255, 250, 242, 0.95), transparent 28%),
-    radial-gradient(circle at 88% 92%, rgba(185, 139, 90, 0.11), transparent 30%);
+    radial-gradient(circle at 88% 92%, rgba(168, 131, 74, 0.11), transparent 30%);
   color: var(--wedding-brown);
 }
 
@@ -40,9 +40,9 @@ a { text-decoration: none; }
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(ellipse at 8% 12%, transparent 0 12%, rgba(185, 139, 90, 0.13) 12.2%, transparent 13%),
-    radial-gradient(ellipse at 92% 88%, transparent 0 13%, rgba(185, 139, 90, 0.12) 13.2%, transparent 14%),
-    linear-gradient(120deg, transparent 0 45%, rgba(185, 139, 90, 0.045) 45.2% 45.5%, transparent 45.7% 100%);
+    radial-gradient(ellipse at 8% 12%, transparent 0 12%, rgba(168, 131, 74, 0.13) 12.2%, transparent 13%),
+    radial-gradient(ellipse at 92% 88%, transparent 0 13%, rgba(168, 131, 74, 0.12) 13.2%, transparent 14%),
+    linear-gradient(120deg, transparent 0 45%, rgba(168, 131, 74, 0.045) 45.2% 45.5%, transparent 45.7% 100%);
   content: "";
   pointer-events: none;
 }
@@ -165,24 +165,24 @@ video { -webkit-transform: translateZ(0); transform: translateZ(0); }
 .sheet-up { animation: sheet-up .38s cubic-bezier(.22, 1, .36, 1) both; }
 
 /* ===== Theme navy ===== */
-.wedding-page { background-color: #f9f3e9 !important; color: #1c3359; }
-.wedding-panel { background: rgba(251,245,236,.92) !important; border: 1px solid rgba(185,139,79,.45) !important; box-shadow: 0 24px 48px -20px rgba(28,51,89,.25) !important; }
-.wedding-button { background: linear-gradient(#456590,#38567f) !important; color: #fff !important; border: 1px solid #d7b98a !important; box-shadow: 0 10px 24px rgba(30,50,90,.28) !important; }
-.wedding-divider span { background-color: #b98b4f !important; }
-.wedding-divider i { color: #b98b4f !important; }
+.wedding-page { background-color: #f9f3e9 !important; color: #3d2b1f; }
+.wedding-panel { background: rgba(251,245,236,.92) !important; border: 1px solid rgba(168,131,74,.45) !important; box-shadow: 0 24px 48px -20px rgba(61,43,31,.25) !important; }
+.wedding-button { background: linear-gradient(#7a5238,#54382a) !important; color: #fff !important; border: 1px solid #d7b98a !important; box-shadow: 0 10px 24px rgba(61,43,31,.28) !important; }
+.wedding-divider span { background-color: #a8834a !important; }
+.wedding-divider i { color: #a8834a !important; }
 
 /* ===== Theme navy v2 ===== */
 html:has(body.guest-theme) { background-color: #fcf4ea; }
 body.guest-theme { background: transparent !important; }
 body.guest-theme::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background-repeat: no-repeat;
-  background-image: url(/references/choice-tl.webp), url(/references/choice-tr.webp), url(/references/choice-bl.webp), url(/references/choice-br.webp);
+  background-image: url(/references/batik-tl.svg), url(/references/batik-tr.svg), url(/references/batik-bl.svg), url(/references/batik-br.svg);
   background-position: left top, right top, left bottom, right bottom;
   background-size: min(54vw, 330px) auto, min(38vw, 300px) auto, min(34vw, 260px) auto, min(46vw, 300px) auto; }
-.wedding-page { background-color: transparent !important; color: #1c3359; }
-.wedding-panel { background: rgba(251,245,236,.92) !important; border: 1px solid rgba(185,139,79,.45) !important; box-shadow: 0 24px 48px -20px rgba(28,51,89,.25) !important; }
-.wedding-button { background: linear-gradient(#456590,#38567f) !important; color: #fff !important; border: 1px solid #d7b98a !important; box-shadow: 0 10px 24px rgba(30,50,90,.28) !important; }
-.wedding-divider span { background-color: #b98b4f !important; }
-.wedding-divider i { color: #b98b4f !important; }
+.wedding-page { background-color: transparent !important; color: #3d2b1f; }
+.wedding-panel { background: rgba(251,245,236,.92) !important; border: 1px solid rgba(168,131,74,.45) !important; box-shadow: 0 24px 48px -20px rgba(61,43,31,.25) !important; }
+.wedding-button { background: linear-gradient(#7a5238,#54382a) !important; color: #fff !important; border: 1px solid #d7b98a !important; box-shadow: 0 10px 24px rgba(61,43,31,.28) !important; }
+.wedding-divider span { background-color: #a8834a !important; }
+.wedding-divider i { color: #a8834a !important; }
 
 /* ===== Theme navy v3 ===== */
 body.guest-theme::before { background-size: min(34vw, 200px) auto, min(26vw, 160px) auto, min(26vw, 160px) auto, min(34vw, 210px) auto; }

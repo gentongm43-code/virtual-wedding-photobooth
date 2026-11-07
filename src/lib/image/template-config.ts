@@ -37,7 +37,7 @@ export type NormalizedTemplateConfig = {
   texts: TemplateText[];
 };
 
-const WEDDING_FRAME_BACKGROUND = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1080' height='1350' viewBox='0 0 1080 1350'%3E%3Crect width='1080' height='1350' fill='%23f7eee7'/%3E%3Crect x='28' y='28' width='1024' height='1294' rx='18' fill='none' stroke='%23b99a72' stroke-width='3'/%3E%3Crect x='45' y='45' width='990' height='1260' rx='12' fill='none' stroke='%23d9bd91' stroke-width='1'/%3E%3Cg fill='none' stroke='%23b99a72' stroke-width='4'%3E%3Cpath d='M45 155V45h110M1035 155V45H925M45 1195v110h110M1035 1195v110H925'/%3E%3C/g%3E%3Cg fill='%23b99a72'%3E%3Ccircle cx='75' cy='75' r='9'/%3E%3Ccircle cx='1005' cy='75' r='9'/%3E%3Ccircle cx='75' cy='1275' r='9'/%3E%3Ccircle cx='1005' cy='1275' r='9'/%3E%3C/g%3E%3Cpath d='M0 1150 Q270 1050 540 1150 T1080 1150 V1350 H0Z' fill='%23ead8c8' fill-opacity='.75'/%3E%3C/svg%3E";
+const WEDDING_FRAME_BACKGROUND = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjEzNTAiIHZpZXdCb3g9IjAgMCAxMDgwIDEzNTAiPjxkZWZzPjxwYXR0ZXJuIGlkPSJrIiB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2E4ODM0YSIgc3Ryb2tlLXdpZHRoPSIxLjEiPjxlbGxpcHNlIGN4PSIyNCIgY3k9IjEyIiByeD0iNyIgcnk9IjEyIi8+PGVsbGlwc2UgY3g9IjI0IiBjeT0iMzYiIHJ4PSI3IiByeT0iMTIiLz48ZWxsaXBzZSBjeD0iMTIiIGN5PSIyNCIgcng9IjEyIiByeT0iNyIvPjxlbGxpcHNlIGN4PSIzNiIgY3k9IjI0IiByeD0iMTIiIHJ5PSI3Ii8+PC9nPjxjaXJjbGUgY3g9IjI0IiBjeT0iMjQiIHI9IjIuMiIgZmlsbD0iI2E4ODM0YSIvPjwvcGF0dGVybj48bGluZWFyR3JhZGllbnQgaWQ9ImZnIiB4MT0iMCIgeTE9IjEwNDAiIHgyPSIwIiB5Mj0iMTE5MCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzAwMCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2ZmZiIvPjwvbGluZWFyR3JhZGllbnQ+PG1hc2sgaWQ9ImYiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjAiIHk9IjAiIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjEzNTAiPjxyZWN0IHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjEzNTAiIGZpbGw9InVybCgjZmcpIi8+PC9tYXNrPjwvZGVmcz48cmVjdCB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxMzUwIiBmaWxsPSIjZjZlZWUwIi8+PHJlY3QgeD0iNjAiIHk9IjEwNDAiIHdpZHRoPSI5NjAiIGhlaWdodD0iMjYyIiBmaWxsPSJ1cmwoI2spIiBvcGFjaXR5PSIuNCIgbWFzaz0idXJsKCNmKSIvPjxyZWN0IHg9IjI4IiB5PSIyOCIgd2lkdGg9IjEwMjQiIGhlaWdodD0iMTI5NCIgcng9IjE0IiBmaWxsPSJub25lIiBzdHJva2U9IiNhODgzNGEiIHN0cm9rZS13aWR0aD0iMyIvPjxyZWN0IHg9IjQ1IiB5PSI0NSIgd2lkdGg9Ijk5MCIgaGVpZ2h0PSIxMjYwIiByeD0iOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZDZiZjkzIiBzdHJva2Utd2lkdGg9IjEiLz48Y2lyY2xlIGN4PSI3NSIgY3k9Ijc1IiByPSIxNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYTg4MzRhIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNNzUgNjdsNiA4IC02IDggLTYgLTh6IiBmaWxsPSIjYTg4MzRhIi8+PGNpcmNsZSBjeD0iMTAwNSIgY3k9Ijc1IiByPSIxNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYTg4MzRhIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNMTAwNSA2N2w2IDggLTYgOCAtNiAtOHoiIGZpbGw9IiNhODgzNGEiLz48Y2lyY2xlIGN4PSI3NSIgY3k9IjEyNzUiIHI9IjE2IiBmaWxsPSJub25lIiBzdHJva2U9IiNhODgzNGEiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik03NSAxMjY3bDYgOCAtNiA4IC02IC04eiIgZmlsbD0iI2E4ODM0YSIvPjxjaXJjbGUgY3g9IjEwMDUiIGN5PSIxMjc1IiByPSIxNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYTg4MzRhIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNMTAwNSAxMjY3bDYgOCAtNiA4IC02IC04eiIgZmlsbD0iI2E4ODM0YSIvPjxnIHN0cm9rZT0iI2E4ODM0YSIgc3Ryb2tlLXdpZHRoPSIxLjUiPjxwYXRoIGQ9Ik0zMDAgMTA1Mkg1MTQiLz48cGF0aCBkPSJNNTY2IDEwNTJINzgwIi8+PC9nPjxwYXRoIGQ9Ik01NDAgMTA0M2w5IDkgLTkgOSAtOSAtOXoiIGZpbGw9IiNhODgzNGEiLz48L3N2Zz4=";
 
 export const DEFAULT_TEMPLATE: NormalizedTemplateConfig = {
   width: 1080,
@@ -47,9 +47,9 @@ export const DEFAULT_TEMPLATE: NormalizedTemplateConfig = {
   logo: null,
   photoSlots: [{ x: 70, y: 105, width: 940, height: 900 }],
   texts: [
-    { text: "{{eventName}}", x: 540, y: 1120, align: "center", fontSize: 48, color: "#332b27" },
-    { text: "{{eventDate}}", x: 540, y: 1180, align: "center", fontSize: 32, color: "#725f53" },
-    { text: "{{location}}", x: 540, y: 1230, align: "center", fontSize: 26, color: "#8d786b" },
+    { text: "{{eventName}}", x: 540, y: 1120, align: "center", fontSize: 48, color: "#3d2b1f" },
+    { text: "{{eventDate}}", x: 540, y: 1180, align: "center", fontSize: 32, color: "#6b4b36" },
+    { text: "{{location}}", x: 540, y: 1230, align: "center", fontSize: 26, color: "#8c7260" },
   ],
 };
 
