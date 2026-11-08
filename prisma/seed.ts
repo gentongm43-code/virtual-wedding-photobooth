@@ -109,9 +109,9 @@ async function main() {
   }
   const template = PHOTOBOOTH_TEMPLATES[0];
   const eventData = {
-      name: "Auliya Insani Putri & Mahfud",
-      date: new Date("2026-08-08T00:00:00.000Z"),
-      location: "Bansari, Temanggung",
+      name: "Putri & Mahfud",
+      date: new Date("2026-11-15T00:00:00.000Z"),
+      location: "Temanggung",
       description: "Terima kasih telah menjadi bagian dari hari istimewa kami.",
       primaryColor: "#2b2927",
       secondaryColor: "#e6cdbd",
