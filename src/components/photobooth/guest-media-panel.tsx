@@ -37,6 +37,32 @@ type Props = {
 };
 type Item = GuestMediaItem;
 
+async function createFlippedStream(source: MediaStream, rafRef: { current: number }): Promise<MediaStream> {
+  const video = document.createElement("video");
+  video.muted = true;
+  video.playsInline = true;
+  video.srcObject = new MediaStream(source.getVideoTracks());
+  await Promise.race([video.play(), new Promise((resolve) => window.setTimeout(resolve, 3000))]);
+  if (!video.videoWidth) await new Promise<void>((resolve) => { video.onloadedmetadata = () => resolve(); window.setTimeout(resolve, 2000); });
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("Canvas tidak tersedia.");
+  const draw = () => {
+    context.save();
+    context.translate(canvas.width, 0);
+    context.scale(-1, 1);
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    context.restore();
+    rafRef.current = requestAnimationFrame(draw);
+  };
+  draw();
+  const output = canvas.captureStream(30);
+  source.getAudioTracks().forEach((track) => output.addTrack(track));
+  return output;
+}
+
 function mimeFor(mode: "video" | "voice") {
   const types = mode === "video"
     ? ["video/webm;codecs=vp8,opus", "video/webm;codecs=vp9,opus", "video/webm", "video/mp4"]
@@ -183,6 +209,11 @@ export default function GuestMediaPanel({
   const [sentItems, setSentItems] = useState<Mode[]>([]);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const rawStreamRef = useRef<MediaStream | null>(null);
+  const rafRef = useRef(0);
+  const [flipVideo, setFlipVideo] = useState(true);
+  const flipRef = useRef(true);
+  flipRef.current = flipVideo;
   const livePreviewRef = useRef<HTMLVideoElement>(null);
   const chunksRef = useRef<Blob[]>([]);
   const startedRef = useRef(0);
@@ -205,7 +236,16 @@ export default function GuestMediaPanel({
     itemsRef.current = items;
   }, [items]);
 
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("video-flip");
+      if (saved !== null) setFlipVideo(saved === "1");
+    } catch { /* abaikan */ }
+  }, []);
+
   useEffect(() => () => {
+    cancelAnimationFrame(rafRef.current);
+    rawStreamRef.current?.getTracks().forEach((track) => track.stop());
     if (timerRef.current) window.clearInterval(timerRef.current);
     streamRef.current?.getTracks().forEach((track) => track.stop());
     itemsRef.current.forEach((item) => {
@@ -262,10 +302,15 @@ export default function GuestMediaPanel({
         if (!settled) { settled = true; reject(reason); }
       });
     });
-    void streamPromise.then((stream) => {
-      streamRef.current = stream;
+    void streamPromise.then(async (stream) => {
+      let recordStream: MediaStream = stream;
+      rawStreamRef.current = stream;
+      if (mode === "video" && flipRef.current && stream.getVideoTracks().length) {
+        try { recordStream = await createFlippedStream(stream, rafRef); } catch { recordStream = stream; }
+      }
+      streamRef.current = recordStream;
       chunksRef.current = [];
-      const recorder = new MediaRecorder(stream, { mimeType });
+      const recorder = new MediaRecorder(recordStream, { mimeType });
       recorderRef.current = recorder;
       startedRef.current = Date.now();
       setRecordingMode(mode);
@@ -275,7 +320,9 @@ export default function GuestMediaPanel({
       recorder.onerror = () => { setError("Rekaman gagal. Silakan coba lagi."); stopRecording(); };
       recorder.onstop = () => {
         if (timerRef.current) window.clearInterval(timerRef.current);
+        cancelAnimationFrame(rafRef.current);
         stream.getTracks().forEach((track) => track.stop());
+        rawStreamRef.current = null;
         streamRef.current = null;
         setRecording(false);
         setRecordingMode(null);
@@ -442,6 +489,7 @@ export default function GuestMediaPanel({
         {stage === "compose" && activeMode && <div className="mt-8 rounded-2xl border border-[#e7dac4] p-4">
           {activeMode === "text" ? <><input value={guestName} onChange={(event) => setGuestName(event.target.value)} maxLength={100} placeholder="Nama (opsional)" className="mb-3 w-full border-b border-[#e7dac4] pb-2 outline-none" /><textarea value={text} onChange={(event) => setText(event.target.value)} rows={5} maxLength={500} placeholder="Tuliskan ucapan untuk kedua mempelai..." className="w-full resize-none outline-none" /><p className="mt-2 text-right text-xs text-[#7b6556]">{text.length} / 500</p></> : activeItem?.recording ? <div className="flex items-center justify-between text-sm font-semibold"><span>{activeOption?.label} siap direview</span><button type="button" onClick={() => startRecording(activeMode)} className="text-[#7b6556]">Rekam lagi</button></div> : <button type="button" onClick={() => startRecording(activeMode)} className="flex w-full items-center gap-3 text-left font-semibold">{activeMode === "video" ? <Video size={19} /> : <Mic size={19} />} Rekam {activeOption?.label}</button>}
         </div>}
+        {activeMode === "video" && !recording && !activeItem?.recording && <label className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-[#e7dac4] bg-white px-4 py-3 text-sm text-[#3d2b1f]"><span>Balik video<span className="block text-xs text-[#7b6556]">Nyalakan/matikan jika hasil terlihat mirror</span></span><input type="checkbox" checked={flipVideo} onChange={(event) => { setFlipVideo(event.target.checked); try { window.localStorage.setItem("video-flip", event.target.checked ? "1" : "0"); } catch { /* abaikan */ } }} className="h-5 w-5 accent-[#6b4b36]" /></label>}
         {recordingMode === "video" && recording && <video ref={livePreviewRef} autoPlay muted playsInline className="mt-4 max-h-64 w-full rounded-xl bg-black object-contain" />}
         {recording && <div className="mt-5 rounded-[1.5rem] bg-[#3d2b1f] p-5 text-center text-sm font-semibold text-white shadow-lg"><div className="flex items-center justify-center gap-2 text-xs uppercase tracking-[0.2em] text-[#f1e6d3]"><span className="guest-pulse h-2.5 w-2.5 rounded-full bg-red-400" /> REC</div><div className="mt-3 font-serif text-3xl">{String(seconds).padStart(2, "0")}s <span className="text-sm font-sans text-white/45">/ {recordingMode === "video" ? videoLimit : voiceNoteDuration}s</span></div><div className="mt-4 flex h-8 items-center justify-center gap-1">{Array.from({ length: 18 }, (_, index) => <span key={index} className="w-1 rounded-full bg-[#f1e6d3]" style={{ height: `${10 + ((index * 7) % 20)}px` }} />)}</div><button type="button" onClick={stopRecording} className="mt-4 min-h-12 rounded-full bg-white px-8 text-sm font-semibold text-[#3d2b1f] active:scale-95">Stop</button></div>}
         {stage === "compose" && <GuestButton type="button" disabled={recording} onClick={continueCurrent} className="mt-8 w-full">{activeMode === "text" || activeIndex === selectedModes.length - 1 ? "Tinjau semua" : "Berikutnya"}</GuestButton>}
