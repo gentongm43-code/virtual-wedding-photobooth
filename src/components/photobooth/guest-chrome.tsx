@@ -17,7 +17,7 @@ export function Corners() {
 export function Rings() {
   return (
     <svg viewBox="0 0 80 56" className="h-8 w-12" fill="none" stroke="#a8834a" strokeWidth="2.5">
-      <circle cx="30" cy="34" r="16" /><circle cx="50" cy="34" r="16" /><path d="M34 12l6-8 6 8-6 6z" />
+      <path d="M40 3C51 17 62 29 62 52H18C18 29 29 17 40 3Z" /><path d="M40 22V52" /><path d="M40 29Q48 35 40 43Q32 35 40 29Z" fill="#a8834a" />
     </svg>
   );
 }
@@ -28,7 +28,7 @@ export function GuestHeader() {
       <div className="flex items-center justify-center gap-3">
         <span className="h-px w-14 bg-[#a8834a]/50 sm:w-28" /><Rings /><span className="h-px w-14 bg-[#a8834a]/50 sm:w-28" />
       </div>
-      <p className="mt-1 text-center text-[10px] font-semibold uppercase tracking-[0.34em] text-[#3d2b1f] sm:text-xs">Wedding Photobooth</p>
+      <p className="mt-1 text-center text-[10px] font-semibold uppercase tracking-[0.34em] text-[#3d2b1f] sm:text-xs">Photobooth Pawiwahan</p>
     </div>
   );
 }

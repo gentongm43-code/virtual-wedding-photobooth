@@ -186,7 +186,7 @@ body.guest-theme::before { content: ""; position: fixed; inset: 0; z-index: -1; 
 
 /* ===== Theme navy v3 ===== */
 body.guest-theme::before { background-size: min(34vw, 200px) auto, min(26vw, 160px) auto, min(26vw, 160px) auto, min(34vw, 210px) auto; }
-body.guest-theme main:not([class*="bg-black"]):not([class*="bg-[#0"]):not([class*="bg-[#1"]) { background: transparent !important; }
+body.guest-theme main:not([class*="bg-black"]):not([class*="bg-[#0"]):not([class*="bg-[#1"]):not([class*="bg-[#2a1d14"]) { background: transparent !important; }
 body.guest-theme .wedding-page::before, body.guest-theme .wedding-page::after { background-image: none !important; }
 
 /* ===== Layar memuat ===== */
@@ -199,3 +199,15 @@ body.guest-theme .wedding-page::before, body.guest-theme .wedding-page::after { 
 .load-ring-2 { animation-delay: 1.1s; }
 .load-bar { animation: load-bar 1.6s ease-in-out infinite; }
 .load-dots::after { content: ""; display: inline-block; width: 1.2em; text-align: left; animation: load-dots 1.4s steps(1) infinite; }
+
+/* ===== Tema Jawa ===== */
+::selection { background: #d9b983; color: #3d2b1f; }
+body.guest-theme::after { content: ""; position: fixed; inset: 0; z-index: 30; pointer-events: none; background-repeat: repeat-x, repeat-x;
+  background-image: url(/references/parang-strip.svg), url(/references/parang-strip.svg); background-position: left top, left bottom; background-size: auto 10px, auto 10px; }
+body.guest-theme .wedding-panel, body.guest-theme [class*="border-[#e7dac4]"] { border-color: #c9a068 !important; background-image: url(/references/ceplok-tile.svg) !important; background-size: 60px 60px; }
+body.guest-theme .wedding-panel { border-radius: 1.2rem !important; box-shadow: 0 24px 48px -20px rgba(61,43,31,.3), inset 0 0 0 5px rgba(251,245,236,.9), inset 0 0 0 6px rgba(168,131,74,.5) !important; }
+body.guest-theme button[class*="bg-[#3d2b1f]"], body.guest-theme button[class*="bg-[#6b4b36]"] { background-image: linear-gradient(#7a5238, #4a2f1f) !important; border: 1px solid #d7b98a !important;
+  box-shadow: inset 0 0 0 2px rgba(241,226,189,.18), 0 10px 24px rgba(61,43,31,.3) !important; }
+body.guest-theme .font-serif { letter-spacing: .01em; }
+body.guest-theme .wedding-divider i { font-size: 0; width: 10px; height: 10px; background: #a8834a; transform: rotate(45deg); animation: none; }
+

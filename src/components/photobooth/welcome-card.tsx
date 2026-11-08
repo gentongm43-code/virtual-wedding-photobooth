@@ -27,7 +27,7 @@ export default function WelcomeCard({ title, bride, groom, date, location, quote
         <div style={line(30.1, 13.9, 22.5)} />
         <div style={line(56.1, 14, 22.5)} />
         <svg viewBox="0 0 80 56" style={{ ...at(22.5), left: "45.5%", right: "auto", width: "9cqw" }} fill="none" stroke={GOLD} strokeWidth="2.5">
-          <circle cx="30" cy="34" r="16" /><circle cx="50" cy="34" r="16" /><path d="M34 12l6-8 6 8-6 6z" />
+          <path d="M40 3C51 17 62 29 62 52H18C18 29 29 17 40 3Z" /><path d="M40 22V52" /><path d="M40 29Q48 35 40 43Q32 35 40 29Z" fill="#a8834a" />
         </svg>
 
         <p style={{ ...at(26.8), color: NAVY, fontSize: "2.7cqw", letterSpacing: "0.36em", textTransform: "uppercase" }}>{title}</p>
@@ -59,7 +59,7 @@ export default function WelcomeCard({ title, bride, groom, date, location, quote
           style={{ left: "20.8%", width: "58.4%", top: "73%", height: "6.5%", borderRadius: 999, border: "0.2cqw solid #d7b98a", background: "linear-gradient(#7a5238,#54382a)", boxShadow: "0 1.2cqw 2.4cqw rgba(61,43,31,.28)", color: "#fff", gap: "3cqw" }}>
           <Heart fill="currentColor" style={{ width: "3.6cqw", height: "3.6cqw" }} />
           <span style={{ width: 1, height: "4cqw", background: "rgba(255,255,255,.5)" }} />
-          <span className="font-serif" style={{ fontSize: "4.4cqw", letterSpacing: "0.03em" }}>Mulai</span>
+          <span className="font-serif" style={{ fontSize: "4.4cqw", letterSpacing: "0.03em" }}>Wiwiti</span>
           <ArrowRight style={{ width: "4cqw", height: "4cqw", marginLeft: "2cqw" }} />
         </button>
       </div>
