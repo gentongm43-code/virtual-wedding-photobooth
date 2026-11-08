@@ -32,7 +32,7 @@ export const eventSchema = z.object({
   templateId: z.string().trim().max(100).optional().or(z.literal("")),
   photoLimit: intField(1, 1, 4),
   allowVideo: checkbox(true),
-  videoDuration: intField(30, 1, 300),
+  videoDuration: intField(120, 1, 120),
   allowVoiceNote: checkbox(true),
   voiceNoteDuration: intField(60, 1, 600),
   allowMessage: checkbox(),

@@ -7,6 +7,7 @@ import { ArrowRight, Camera, ChevronRight, Heart, Mic, Pencil, Video } from "luc
 import Link from "next/link";
 import PhotoSession, { type CapturedPhoto } from "./photo-session";
 import GuestMediaPanel, { type GuestMediaItem, type GuestMediaRecording } from "./guest-media-panel";
+import VideoSession from "./video-session";
 import { GuestButton, SelectedMark } from "./guest-ui";
 import WelcomeCard from "./welcome-card";
 import FrameScreen from "./frame-screen";
@@ -23,7 +24,7 @@ function pairNames(inv: Record<string, string> | undefined, eventName: string) {
   return { bride: first, groom: second };
 }
 
-type Step = "invitation" | "photobooth-start" | "main-choice" | "frame" | "video-mode" | "memory" | "photo" | "media" | "done";
+type Step = "invitation" | "photobooth-start" | "main-choice" | "frame" | "video-mode" | "video-camera" | "memory" | "photo" | "media" | "done";
 export type GuestExperienceProps = {
   eventId: string; eventName: string; eventDate: string; location?: string | null;
   description?: string | null; coverImage?: string | null; logo?: string | null;
@@ -54,6 +55,7 @@ function GuestExperience(props: GuestExperienceProps) {
   }, []);
   const [mainMode, setMainMode] = useState<"photo" | "video" | null>(null);
   const [selectedVideoMode, setSelectedVideoMode] = useState<VideoGuestbookMode>("normal");
+  const [videoRecording, setVideoRecording] = useState<GuestMediaRecording | null>(null);
   const [photoCount, setPhotoCount] = useState(Math.min(4, Math.max(1, props.defaultPhotoCount)));
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [pendingPhotos, setPendingPhotos] = useState<CapturedPhoto[]>([]);
@@ -162,7 +164,8 @@ function GuestExperience(props: GuestExperienceProps) {
   const mediaModes = mainMode === "video" ? ["video", ...optionalModes] as ("video" | "voice" | "text")[] : optionalModes;
 
   if (step === "photo") return <PhotoSession {...props} defaultPhotoCount={photoCount} selectedTemplate={props.frames.find((frame) => frame.id === selectedFrameId) ?? null} sessionId={sessionId} onSessionCreated={setSessionId} onBack={() => setStep("frame")} onComplete={(id, photos) => { setSessionId(id); setPendingPhotos(photos); setStep("memory"); }} />;
-  if (step === "media") return <GuestMediaPanel {...props} selectedModes={mainMode === "video" ? ["video"] : mediaModes} initialItems={mainMode === "video" ? [] : memoryItems} startInReview={mainMode === "photo"} pendingPhotos={pendingPhotos} selectedFrameId={selectedFrameId} selectedTemplate={props.frames.find((frame) => frame.id === selectedFrameId) ?? null} sessionId={sessionId} onBack={() => setStep(mainMode === "video" ? "video-mode" : "memory")} videoCaptureMode={mainMode === "video" ? selectedVideoMode : "normal"} />;
+  if (step === "video-camera") return <VideoSession eventName={props.eventName} maxSeconds={selectedVideoMode === "boomerang" ? Math.max(1, Math.min(3, Math.floor(props.videoDuration / 2))) : Math.min(120, props.videoDuration)} boomerang={selectedVideoMode === "boomerang"} onBack={() => setStep("video-mode")} onComplete={(recording) => { setVideoRecording(recording); setStep("media"); }} />;
+  if (step === "media") return <GuestMediaPanel {...props} selectedModes={mainMode === "video" ? ["video"] : mediaModes} initialItems={mainMode === "video" ? (videoRecording ? [{ mode: "video", recording: videoRecording }] : []) : memoryItems} startInReview={mainMode === "photo" || (mainMode === "video" && Boolean(videoRecording))} pendingPhotos={pendingPhotos} selectedFrameId={selectedFrameId} selectedTemplate={props.frames.find((frame) => frame.id === selectedFrameId) ?? null} sessionId={sessionId} onBack={() => { if (mainMode === "video") { setVideoRecording(null); setStep("video-camera"); } else setStep("memory"); }} videoCaptureMode={mainMode === "video" ? selectedVideoMode : "normal"} />;
   if (step === "done") return <main className="wedding-page grid min-h-screen place-items-center px-6 text-[#3d2b1f]"><div className="wedding-panel wedding-rise w-full max-w-md rounded-[2rem] p-7 text-center"><span className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-[#3d2b1f] text-[#fbf5ec]"><Heart size={28} fill="currentColor" /></span><h1 className="mt-7 font-serif text-5xl">Terima kasih</h1><p className="mt-4 text-sm leading-7 text-[#7b6556]">Kenangan Anda telah tersimpan dengan baik.</p><div className="mt-8 grid gap-3"><Link href={`/event/${props.eventId}/gallery`} className="wedding-button rounded-2xl px-5 py-4 text-sm font-semibold">Lihat Galeri Kenangan</Link><GuestButton type="button" variant="secondary" onClick={() => { setStep("invitation"); setMainMode(null); setMemoryText(""); setMemoryRecording(null); setSessionId(null); }} className="w-full">Kembali ke Undangan</GuestButton></div></div></main>;
 
   if (step === "invitation") return <WelcomeCard title={props.invitation?.weddingTitle || "The Wedding Of"} bride={pairNames(props.invitation, props.eventName).bride} groom={pairNames(props.invitation, props.eventName).groom} date={props.invitation?.dateLabel || props.eventDate} location={props.location} quote={props.invitation?.quote || "Setiap kisah cinta punya rumahnya sendiri."} onStart={() => setStep("main-choice")} />;
@@ -201,7 +204,7 @@ function GuestExperience(props: GuestExperienceProps) {
 
   if (step === "video-mode") {
     const videoOptions: { value: VideoGuestbookMode; label: string; description: string; status: string; available: boolean }[] = [
-      { value: "normal", label: "Video biasa", description: `Rekam video hingga ${props.videoDuration} detik dengan suara.`, status: "Tersedia", available: true },
+      { value: "normal", label: "Video biasa", description: `Rekam video hingga ${props.videoDuration >= 60 && props.videoDuration % 60 === 0 ? `${props.videoDuration / 60} menit` : `${props.videoDuration} detik`} dengan suara.`, status: "Tersedia", available: true },
       { value: "boomerang", label: "Boomerang", description: `Rekam hingga ${Math.max(1, Math.min(3, Math.floor(props.videoDuration / 2)))} detik, lalu diputar maju-mundur untuk loop yang berkesan.`, status: "Eksperimen", available: true },
     ];
     return <main className="relative min-h-screen overflow-hidden bg-[#2a1d14] px-5 py-10 text-[#f6eee0]"><img src="/references/batik-tl.svg" alt="" aria-hidden="true" draggable={false} className="pointer-events-none absolute left-0 top-0 w-[48vw] max-w-[340px] opacity-60" /><img src="/references/batik-br.svg" alt="" aria-hidden="true" draggable={false} className="pointer-events-none absolute bottom-0 right-0 w-[48vw] max-w-[340px] opacity-60" /><div className="guest-fade relative z-10 mx-auto max-w-lg"><button type="button" onClick={() => setStep("main-choice")} className="text-sm font-semibold text-[#f1e6d3]">← Kembali</button><p className="mt-10 text-xs font-semibold uppercase tracking-[0.3em] text-[#d9b983]">Pesan Video</p><h1 className="mt-4 font-serif text-5xl font-semibold text-[#f6eee0]">Abadikan Kenangan</h1><div className="mt-5 flex items-center gap-3 text-[#d9b983]"><span className="h-px w-12 bg-[#d9b983]/60" /><svg viewBox="0 0 40 52" className="h-9 w-7 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M20 3C26 14 33 22 33 36H7C7 22 14 14 20 3Z" /><path d="M20 16V36" /><path d="M20 24l4 5-4 5-4-5z" fill="currentColor" stroke="none" /></svg><span className="h-px flex-1 bg-gradient-to-r from-[#d9b983]/60 to-transparent" /></div><p className="mt-5 text-sm leading-7 text-[#f6eee0]/70">Pilih cara merekam ucapan dan doa restu untuk kedua mempelai.</p><div className="mt-9 grid gap-3">{videoOptions.map((option) => { const selected = selectedVideoMode === option.value; return <button type="button" key={option.value} onClick={() => setSelectedVideoMode(option.value)} className={`rounded-2xl border p-5 text-left transition ${selected ? "border-[#d9b983] bg-[#d9b983]/12 shadow-lg shadow-black/20" : "border-[#d9b983]/20 bg-white/5 opacity-85"}`}><div className="flex items-center justify-between gap-3"><div><strong className="block font-serif text-2xl font-semibold">{option.label}</strong><span className="mt-1 block text-sm text-[#f6eee0]/60">{option.description}</span></div>{option.available ? <span className="inline-flex rounded-full bg-[#d9b983]/20 px-3 py-1 text-[10px] font-semibold text-[#e6cfa0]">{option.status}</span> : <span className="inline-flex rounded-full bg-white/10 px-3 py-1 text-[10px] font-semibold text-white/45">{option.status}</span>}</div></button>; })}</div>{error && <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}<GuestButton type="button" onClick={() => {
@@ -210,7 +213,7 @@ function GuestExperience(props: GuestExperienceProps) {
         return;
       }
       setError("");
-      setStep("media");
+      setStep("video-camera");
     }} variant="secondary" className="mt-8 w-full border-[#d9b983] bg-gradient-to-b from-[#e2c590] to-[#c9a468] text-[#3d2b1f]">Lanjut</GuestButton><p className="mt-4 text-center text-xs text-[#f6eee0]/45">Mode video memakai format recorder yang didukung perangkat Anda.</p></div></main>;
   }
 

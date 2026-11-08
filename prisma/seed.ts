@@ -120,7 +120,7 @@ async function main() {
       photoLimit: 3,
       saveOriginal: true,
       allowVideo: true,
-      videoDuration: 30,
+      videoDuration: 120,
       allowVoiceNote: true,
       voiceNoteDuration: 60,
       allowMessage: true,

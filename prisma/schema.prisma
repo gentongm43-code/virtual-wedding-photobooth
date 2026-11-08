@@ -64,7 +64,7 @@ model Event {
   templateId    String?
   photoLimit    Int            @default(1)
   allowVideo    Boolean        @default(true)
-  videoDuration Int            @default(30)
+  videoDuration Int            @default(120)
   allowVoiceNote Boolean       @default(true)
   voiceNoteDuration Int        @default(60)
   allowMessage  Boolean        @default(false)

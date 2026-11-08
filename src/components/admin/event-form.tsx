@@ -156,7 +156,7 @@ export default function EventForm({ templates, initial }: { templates: TemplateO
             <span><span className="block text-sm font-medium text-[#302b28]">Izinkan video</span><span className="block text-xs text-[#9a8d83]">Tamu bisa merekam video singkat.</span></span>
             <input type="checkbox" name="allowVideo" defaultChecked={initial?.allowVideo ?? true} className="h-5 w-5 shrink-0 accent-[#b99261]" />
           </label>
-          <div className="mt-3 flex items-center gap-2 text-xs text-[#8f837b]">Durasi maksimal <input name="videoDuration" type="number" min="1" max="300" defaultValue={initial?.videoDuration ?? 30} className="w-20 rounded-lg border border-[#e3d8cf] px-3 py-2 text-sm text-[#302b28]" aria-label="Durasi video (detik)" /> detik</div>
+          <div className="mt-3 flex items-center gap-2 text-xs text-[#8f837b]">Durasi maksimal <input name="videoDuration" type="number" min="1" max="120" defaultValue={initial?.videoDuration ?? 120} className="w-20 rounded-lg border border-[#e3d8cf] px-3 py-2 text-sm text-[#302b28]" aria-label="Durasi video (detik)" /> detik</div>
         </div>
         <div className="rounded-2xl border border-[#eee3d9] bg-[#fffdfa] px-4 py-3.5">
           <label className="flex items-center justify-between gap-4">
