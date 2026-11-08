@@ -12,8 +12,8 @@ export default async function EventGalleryPage({ params, searchParams }: { param
     include: { photos: { orderBy: { createdAt: "desc" } }, videos: { orderBy: { createdAt: "desc" } }, voiceNotes: { orderBy: { createdAt: "desc" } }, messages: { orderBy: { createdAt: "desc" } } },
   });
   if (!event) notFound();
-  if (!event.active) return <main className="grid min-h-screen place-items-center bg-[#f8f2ed] px-6 text-center"><p>Event sedang tidak tersedia.</p></main>;
-  if (!event.allowPublicGallery) return <main className="grid min-h-screen place-items-center bg-[#f8f2ed] px-6 text-center"><p>Galeri untuk event ini tidak tersedia untuk publik.</p></main>;
+  if (!event.active) return <main className="grid min-h-screen place-items-center bg-[#f1f4f2] px-6 text-center"><p>Event sedang tidak tersedia.</p></main>;
+  if (!event.allowPublicGallery) return <main className="grid min-h-screen place-items-center bg-[#f1f4f2] px-6 text-center"><p>Galeri untuk event ini tidak tersedia untuk publik.</p></main>;
   const memories = new Map<string, {
     id: string;
     eventId: string;

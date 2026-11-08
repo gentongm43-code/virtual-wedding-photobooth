@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { NATURAL_WB, PHOTO_FILTER_WB_ID } from "@/lib/image/photo-filter";
 
 export const metadata: Metadata = {
   title: "Wedding Photobooth — Virtual Wedding Photobooth",
@@ -45,7 +46,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
       </head>
-      <body className="min-h-screen" suppressHydrationWarning>{children}</body>
+      <body className="min-h-screen" suppressHydrationWarning>
+        <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" focusable="false">
+          <filter id={PHOTO_FILTER_WB_ID} colorInterpolationFilters="sRGB">
+            <feColorMatrix type="matrix" values={`${NATURAL_WB[0]} 0 0 0 0  0 ${NATURAL_WB[1]} 0 0 0  0 0 ${NATURAL_WB[2]} 0 0  0 0 0 1 0`} />
+          </filter>
+        </svg>
+        {children}
+      </body>
     </html>
   );
 }

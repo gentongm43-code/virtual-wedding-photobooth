@@ -16,9 +16,9 @@ type TemplateRecord = {
   textConfig?: unknown;
 };
 
-const inputClass = "mt-1.5 w-full rounded-xl border border-[#e3d8cf] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#b99261]";
-const labelClass = "block text-[13px] font-medium text-[#5f554e]";
-const hintClass = "block text-[11px] font-normal text-[#a59689]";
+const inputClass = "mt-1.5 w-full rounded-xl border border-[#d2dee0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#88a6bb]";
+const labelClass = "block text-[13px] font-medium text-[#4e7088]";
+const hintClass = "block text-[11px] font-normal text-[#95afc2]";
 
 export default function TemplateForm({ template }: { template?: TemplateRecord | null }) {
   const router = useRouter();
@@ -67,31 +67,31 @@ export default function TemplateForm({ template }: { template?: TemplateRecord |
         <label className={labelClass}>Tinggi (px)<input required name="height" type="number" inputMode="numeric" defaultValue={String(template?.height ?? 1350)} className={inputClass} /></label>
       </div>
 
-      <div className="space-y-3 rounded-2xl border border-[#f0e5dc] bg-[#fcf8f4] p-4">
-        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#a77943]">Gambar (URL)</p>
+      <div className="space-y-3 rounded-2xl border border-[#e2eae6] bg-[#f7f9f8] p-4">
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6a8fa9]">Gambar (URL)</p>
         <label className={labelClass}>Background<span className={hintClass}>Kanvas final</span><input name="background" type="url" defaultValue={template?.background ?? ""} className={inputClass} placeholder="https://..." /></label>
         <label className={labelClass}>Overlay dekorasi<span className={hintClass}>Border / ornamen</span><input name="overlay" type="url" defaultValue={template?.overlay ?? ""} className={inputClass} placeholder="https://..." /></label>
         <label className={labelClass}>Logo<span className={hintClass}>Opsional</span><input name="logo" type="url" defaultValue={template?.logo ?? ""} className={inputClass} placeholder="https://..." /></label>
       </div>
 
-      <details open={advanced} onToggle={(event) => setAdvanced(event.currentTarget.open)} className="group rounded-2xl border border-[#eee3d9] bg-[#fffdfa]">
+      <details open={advanced} onToggle={(event) => setAdvanced(event.currentTarget.open)} className="group rounded-2xl border border-[#e0e7e3] bg-[#f8faf9]">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5 [&::-webkit-details-marker]:hidden">
           <span>
-            <span className="block text-sm font-semibold text-[#302b28]">Lanjutan: slot foto &amp; teks</span>
-            <span className="block text-xs text-[#9a8d83]">Konfigurasi JSON, sudah terisi nilai bawaan.</span>
+            <span className="block text-sm font-semibold text-[#2b3a46]">Lanjutan: slot foto &amp; teks</span>
+            <span className="block text-xs text-[#8aa7bc]">Konfigurasi JSON, sudah terisi nilai bawaan.</span>
           </span>
-          <ChevronDown size={16} className="shrink-0 text-[#a59689] transition group-open:rotate-180" />
+          <ChevronDown size={16} className="shrink-0 text-[#95afc2] transition group-open:rotate-180" />
         </summary>
-        <div className="border-t border-[#f0e7de] px-4 py-4">
+        <div className="border-t border-[#e4eae7] px-4 py-4">
           <label className={labelClass}>Photo slots &amp; teks<span className={hintClass}>Pakai <code>photoSlots</code> untuk area foto, dan <code>{"{{eventName}}"}</code> untuk teks dinamis.</span>
-            <textarea name="textConfig" defaultValue={defaultConfig} rows={12} className="mt-1.5 w-full rounded-xl border border-[#e3d8cf] bg-white px-3 py-3 font-mono text-xs leading-5 outline-none focus:border-[#b99261]" />
+            <textarea name="textConfig" defaultValue={defaultConfig} rows={12} className="mt-1.5 w-full rounded-xl border border-[#d2dee0] bg-white px-3 py-3 font-mono text-xs leading-5 outline-none focus:border-[#88a6bb]" />
           </label>
         </div>
       </details>
 
       {error && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
       {saved && !error && <p className="rounded-xl bg-[#eaf5ed] px-4 py-3 text-sm text-[#4c8a5a]">Template berhasil disimpan.</p>}
-      <button disabled={saving} className="w-full rounded-xl bg-[#302b28] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#4a423d] disabled:opacity-60">{saving ? "Menyimpan..." : isEditing ? "Simpan perubahan" : "Simpan template"}</button>
+      <button disabled={saving} className="w-full rounded-xl bg-[#2b3a46] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#3d5264] disabled:opacity-60">{saving ? "Menyimpan..." : isEditing ? "Simpan perubahan" : "Simpan template"}</button>
     </form>
   );
 }

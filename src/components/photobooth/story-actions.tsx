@@ -35,7 +35,7 @@ async function buildFrame(p: Props) {
   if (!ctx) throw new Error("Canvas tidak tersedia.");
   if (document.fonts?.ready) await document.fonts.ready;
   ctx.imageSmoothingQuality = "high";
-  ctx.fillStyle = "#f5ede7";
+  ctx.fillStyle = "#ecf0ee";
   ctx.fillRect(0, 0, width, height);
 
   const [bg, logo, overlay] = await Promise.all([config.background, config.logo, config.overlay].map((v) => (v ? loadImage(v) : Promise.resolve(null))));
@@ -69,7 +69,7 @@ async function buildFrame(p: Props) {
   for (const item of texts) {
     const resolved = resolveTemplateText(item.text, vars);
     const fit = fitTemplateText(item, resolved, width);
-    ctx.fillStyle = item.color ?? "#332b27";
+    ctx.fillStyle = item.color ?? "#2c3b48";
     ctx.font = `600 ${fit.fontSize}px ${item.fontFamily ?? "Arial"}`;
     ctx.textAlign = fit.align === "left" ? "left" : fit.align === "right" ? "right" : "center";
     ctx.textBaseline = "alphabetic";
@@ -86,14 +86,14 @@ function buildStory(frame: HTMLCanvasElement) {
   canvas.height = H;
   const ctx = canvas.getContext("2d")!;
   const g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, "#f8eee3");
-  g.addColorStop(0.55, "#efdcc6");
-  g.addColorStop(1, "#d9bd9a");
+  g.addColorStop(0, "#ebf0ee");
+  g.addColorStop(0.55, "#d4dfe1");
+  g.addColorStop(1, "#adc2c6");
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
   const glow = ctx.createRadialGradient(W / 2, H * 0.42, 40, W / 2, H * 0.42, W);
-  glow.addColorStop(0, "rgba(255,250,240,.7)");
-  glow.addColorStop(1, "rgba(255,250,240,0)");
+  glow.addColorStop(0, "rgba(246,249,248,.7)");
+  glow.addColorStop(1, "rgba(246,249,248,0)");
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, W, H);
 
@@ -103,7 +103,7 @@ function buildStory(frame: HTMLCanvasElement) {
   const w = frame.width * scale, h = frame.height * scale;
   const x = (W - w) / 2, y = top + (maxH - h) / 2;
   ctx.save();
-  ctx.shadowColor = "rgba(60,40,25,.35)";
+  ctx.shadowColor = "rgba(42,57,69,.35)";
   ctx.shadowBlur = 50;
   ctx.shadowOffsetY = 18;
   ctx.fillStyle = "#fff";
@@ -174,17 +174,17 @@ export default function StoryActions(props: Props) {
   return (
     <div className="mt-6 grid gap-2.5">
       {canShare && (
-        <button type="button" onClick={() => void run("share")} disabled={Boolean(busy)} className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#cfa36a] to-[#a8773f] text-sm font-semibold text-white shadow-lg shadow-[#a8773f]/30 transition active:scale-[.98] disabled:opacity-60">
+        <button type="button" onClick={() => void run("share")} disabled={Boolean(busy)} className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#9cb4c6] to-[#688da8] text-sm font-semibold text-white shadow-lg shadow-[#688da8]/30 transition active:scale-[.98] disabled:opacity-60">
           <Share2 size={17} /> {busy === "share" ? "Menyiapkan..." : "Bagikan ke Instagram Story"}
         </button>
       )}
-      <button type="button" onClick={() => void run("story")} disabled={Boolean(busy)} className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#c99a62] bg-[#fffaf6] text-sm font-semibold text-[#6f5748] transition active:scale-[.98] disabled:opacity-60">
+      <button type="button" onClick={() => void run("story")} disabled={Boolean(busy)} className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#93aec1] bg-[#f8faf9] text-sm font-semibold text-[#52758e] transition active:scale-[.98] disabled:opacity-60">
         <Download size={17} /> {busy === "story" ? "Menyiapkan..." : "Simpan Foto (Format Story)"}
       </button>
-      <button type="button" onClick={() => void run("orig")} disabled={Boolean(busy)} className="text-xs font-semibold text-[#957c6c] underline underline-offset-4">
+      <button type="button" onClick={() => void run("orig")} disabled={Boolean(busy)} className="text-xs font-semibold text-[#789ab2] underline underline-offset-4">
         {busy === "orig" ? "Menyiapkan..." : "Simpan ukuran asli bingkai"}
       </button>
-      {msg && <p className="text-center text-xs text-[#8f837b]">{msg}</p>}
+      {msg && <p className="text-center text-xs text-[#7e9eb5]">{msg}</p>}
     </div>
   );
 }

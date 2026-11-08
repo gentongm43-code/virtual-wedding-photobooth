@@ -47,7 +47,7 @@ export function PhotoPreview({
   const { width, height, photoSlots, texts } = config;
   const variables = { eventName, eventDate, location: location ?? "" };
   const layerStyle = { aspectRatio: `${width} / ${height}` } as CSSProperties;
-  return <div className="relative w-full overflow-hidden rounded-xl bg-[#f5ede7]" style={{ ...layerStyle, containerType: "inline-size" }}>
+  return <div className="relative w-full overflow-hidden rounded-xl bg-[#ecf0ee]" style={{ ...layerStyle, containerType: "inline-size" }}>
     {config.background && <img src={config.background} alt="" className="absolute inset-0 h-full w-full object-cover" />}
     {(photoUrls ?? (photoUrl ? [photoUrl] : [])).map((url, index) => {
       const area = photoSlots[index];
@@ -58,7 +58,7 @@ export function PhotoPreview({
       {texts.map((item, index) => {
         const resolved = resolveTemplateText(item.text, variables);
         const fit = fitTemplateText(item, resolved, width);
-        return <text key={`${item.text}-${index}`} x={item.x} y={item.y} textAnchor={fit.align === "left" ? "start" : fit.align === "right" ? "end" : "middle"} fill={item.color ?? "#332b27"} fontFamily={item.fontFamily ?? "Arial"} fontSize={fit.fontSize} fontWeight={600}>{resolved}</text>;
+        return <text key={`${item.text}-${index}`} x={item.x} y={item.y} textAnchor={fit.align === "left" ? "start" : fit.align === "right" ? "end" : "middle"} fill={item.color ?? "#2c3b48"} fontFamily={item.fontFamily ?? "Arial"} fontSize={fit.fontSize} fontWeight={600}>{resolved}</text>;
       })}
     </svg>
     {config.overlay && <img src={config.overlay} alt="" className="absolute inset-0 h-full w-full object-fill" />}

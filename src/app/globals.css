@@ -1,21 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Javanese:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Noto+Serif:wght@400;500;600&family=Great+Vibes&family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Javanese:wght@400;600&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #f8eee3;
-  --foreground: #5e4737;
-  --wedding-ivory: #fffaf2;
-  --wedding-cream: #f8eee3;
-  --wedding-brown: #5e4737;
-  --wedding-gold: #b98b5a;
-  --wedding-line: rgba(174, 132, 91, 0.24);
+  --background: #ebf0ee;
+  --foreground: #42596c;
+  --wedding-ivory: #f8f9f8;
+  --wedding-cream: #ebf0ee;
+  --wedding-brown: #42596c;
+  --wedding-gold: #84a2b8;
+  --wedding-line: rgba(125, 157, 180, 0.24);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: "DM Sans", sans-serif;
-  --font-serif: "Cormorant Garamond", "Playfair Display", serif;
+  --font-serif: "Playfair Display", "Cormorant Garamond", serif;
 }
 
 * { box-sizing: border-box; }
@@ -29,9 +29,9 @@ a { text-decoration: none; }
   position: relative;
   isolation: isolate;
   background:
-    linear-gradient(180deg, rgba(248, 238, 227, 0.9), rgba(248, 238, 227, 0.98)),
-    radial-gradient(circle at 12% 8%, rgba(255, 250, 242, 0.95), transparent 28%),
-    radial-gradient(circle at 88% 92%, rgba(168, 131, 74, 0.11), transparent 30%);
+    linear-gradient(180deg, rgba(235, 240, 238, 0.9), rgba(235, 240, 238, 0.98)),
+    radial-gradient(circle at 12% 8%, rgba(248, 249, 248, 0.95), transparent 28%),
+    radial-gradient(circle at 88% 92%, rgba(111, 147, 172, 0.11), transparent 30%);
   color: var(--wedding-brown);
 }
 
@@ -40,9 +40,9 @@ a { text-decoration: none; }
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(ellipse at 8% 12%, transparent 0 12%, rgba(168, 131, 74, 0.13) 12.2%, transparent 13%),
-    radial-gradient(ellipse at 92% 88%, transparent 0 13%, rgba(168, 131, 74, 0.12) 13.2%, transparent 14%),
-    linear-gradient(120deg, transparent 0 45%, rgba(168, 131, 74, 0.045) 45.2% 45.5%, transparent 45.7% 100%);
+    radial-gradient(ellipse at 8% 12%, transparent 0 12%, rgba(111, 147, 172, 0.13) 12.2%, transparent 13%),
+    radial-gradient(ellipse at 92% 88%, transparent 0 13%, rgba(111, 147, 172, 0.12) 13.2%, transparent 14%),
+    linear-gradient(120deg, transparent 0 45%, rgba(111, 147, 172, 0.045) 45.2% 45.5%, transparent 45.7% 100%);
   content: "";
   pointer-events: none;
 }
@@ -58,20 +58,20 @@ a { text-decoration: none; }
 }
 
 .wedding-panel {
-  border: 1px solid rgba(174, 132, 91, 0.2);
-  background: rgba(255, 250, 242, 0.78);
-  box-shadow: 0 1.25rem 2.5rem rgba(94, 71, 55, 0.08);
+  border: 1px solid rgba(125, 157, 180, 0.2);
+  background: rgba(248, 249, 248, 0.78);
+  box-shadow: 0 1.25rem 2.5rem rgba(66, 89, 108, 0.08);
   backdrop-filter: blur(0.45rem);
 }
 
 .wedding-button {
-  background: linear-gradient(135deg, #c49a68, #8a6449);
-  color: #fffaf2;
-  box-shadow: 0 0.75rem 1.5rem rgba(94, 71, 55, 0.18);
+  background: linear-gradient(135deg, #94aec1, #5c84a0);
+  color: #f8f9f8;
+  box-shadow: 0 0.75rem 1.5rem rgba(66, 89, 108, 0.18);
 }
 
 .wedding-button:hover {
-  background: linear-gradient(135deg, #d0a975, #765642);
+  background: linear-gradient(135deg, #92aeb3, #52758f);
 }
 
 @keyframes guest-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .55; transform: scale(.94); } }
@@ -94,7 +94,7 @@ a { text-decoration: none; }
 .page-enter article:nth-child(n+6) { animation-delay: .3s; }
 
 .page-enter article { transition: transform .35s cubic-bezier(.22, 1, .36, 1), box-shadow .35s ease; will-change: transform; }
-.page-enter article:hover { transform: translateY(-6px) scale(1.012); box-shadow: 0 22px 40px -18px rgba(141, 117, 101, .45); }
+.page-enter article:hover { transform: translateY(-6px) scale(1.012); box-shadow: 0 22px 40px -18px rgba(111, 147, 172, .45); }
 
 button, a[role="button"] { transition: transform .15s ease, filter .2s ease; }
 button:not(:disabled):active { transform: scale(.95); }
@@ -129,15 +129,15 @@ button:not(:disabled):hover { filter: brightness(1.04); }
 
 .wedding-rise { animation: wedding-rise .9s cubic-bezier(.22, 1, .36, 1) both; }
 .wedding-panel {
-  background: linear-gradient(180deg, rgba(255, 253, 249, .94), rgba(252, 245, 235, .88));
+  background: linear-gradient(180deg, rgba(248, 250, 249, .94), rgba(242, 245, 243, .88));
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-  border: 1px solid rgba(201, 154, 98, .38);
-  box-shadow: 0 34px 60px -30px rgba(94, 71, 55, .5), inset 0 0 0 6px rgba(255, 255, 255, .55), inset 0 0 0 7px rgba(201, 154, 98, .25);
+  border: 1px solid rgba(147, 174, 193, .38);
+  box-shadow: 0 34px 60px -30px rgba(66, 89, 108, .5), inset 0 0 0 6px rgba(255, 255, 255, .55), inset 0 0 0 7px rgba(147, 174, 193, .25);
 }
 .wedding-button {
-  position: relative; overflow: hidden; color: #fffaf2;
-  background: linear-gradient(135deg, #cfa36a, #a8773f);
-  box-shadow: 0 16px 28px -14px rgba(143, 100, 50, .75);
+  position: relative; overflow: hidden; color: #f8f9f8;
+  background: linear-gradient(135deg, #9cb4c6, #688da8);
+  box-shadow: 0 16px 28px -14px rgba(85, 122, 148, .75);
   letter-spacing: .04em;
 }
 .wedding-button::after {
@@ -145,9 +145,9 @@ button:not(:disabled):hover { filter: brightness(1.04); }
   background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .55), transparent);
   animation: sheen 3.6s ease-in-out infinite;
 }
-.wedding-divider { display: flex; align-items: center; justify-content: center; gap: 12px; width: 62%; color: #c99a62; }
-.wedding-divider span { height: 1px; flex: 1; background: linear-gradient(90deg, transparent, #c99a62); }
-.wedding-divider span:last-child { background: linear-gradient(270deg, transparent, #c99a62); }
+.wedding-divider { display: flex; align-items: center; justify-content: center; gap: 12px; width: 62%; color: #93aec1; }
+.wedding-divider span { height: 1px; flex: 1; background: linear-gradient(90deg, transparent, #93aec1); }
+.wedding-divider span:last-child { background: linear-gradient(270deg, transparent, #93aec1); }
 .wedding-divider i { font-style: normal; font-size: 11px; animation: drift 4s ease-in-out infinite; }
 .guest-fade > * { animation: wedding-rise .8s cubic-bezier(.22, 1, .36, 1) both; }
 .guest-fade > *:nth-child(2) { animation-delay: .08s; }
@@ -165,28 +165,28 @@ video { -webkit-transform: translateZ(0); transform: translateZ(0); }
 .sheet-up { animation: sheet-up .38s cubic-bezier(.22, 1, .36, 1) both; }
 
 /* ===== Theme navy ===== */
-.wedding-page { background-color: #f9f3e9 !important; color: #3d2b1f; }
-.wedding-panel { background: rgba(251,245,236,.92) !important; border: 1px solid rgba(168,131,74,.45) !important; box-shadow: 0 24px 48px -20px rgba(61,43,31,.25) !important; }
-.wedding-button { background: linear-gradient(#7a5238,#54382a) !important; color: #fff !important; border: 1px solid #d7b98a !important; box-shadow: 0 10px 24px rgba(61,43,31,.28) !important; }
-.wedding-divider span { background-color: #a8834a !important; }
-.wedding-divider i { color: #a8834a !important; }
+.wedding-page { background-color: #eff3f1 !important; color: #2d3c49; }
+.wedding-panel { background: rgba(242, 245, 243,.92) !important; border: 1px solid rgba(111, 147, 172,.45) !important; box-shadow: 0 24px 48px -20px rgba(45, 60, 73,.25) !important; }
+.wedding-button { background: linear-gradient(#50728b,#3a4e5e) !important; color: #fff !important; border: 1px solid #a2babf !important; box-shadow: 0 10px 24px rgba(45, 60, 73,.28) !important; }
+.wedding-divider span { background-color: #6f93ac !important; }
+.wedding-divider i { color: #6f93ac !important; }
 
 /* ===== Theme navy v2 ===== */
-html:has(body.guest-theme) { background-color: #fcf4ea; }
+html:has(body.guest-theme) { background-color: #f1f5f3; }
 body.guest-theme { background: transparent !important; }
 body.guest-theme::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background-repeat: no-repeat;
   background-image: url(/references/batik-tl.svg), url(/references/batik-tr.svg), url(/references/batik-bl.svg), url(/references/batik-br.svg);
   background-position: left top, right top, left bottom, right bottom;
   background-size: min(54vw, 330px) auto, min(38vw, 300px) auto, min(34vw, 260px) auto, min(46vw, 300px) auto; }
-.wedding-page { background-color: transparent !important; color: #3d2b1f; }
-.wedding-panel { background: rgba(251,245,236,.92) !important; border: 1px solid rgba(168,131,74,.45) !important; box-shadow: 0 24px 48px -20px rgba(61,43,31,.25) !important; }
-.wedding-button { background: linear-gradient(#7a5238,#54382a) !important; color: #fff !important; border: 1px solid #d7b98a !important; box-shadow: 0 10px 24px rgba(61,43,31,.28) !important; }
-.wedding-divider span { background-color: #a8834a !important; }
-.wedding-divider i { color: #a8834a !important; }
+.wedding-page { background-color: transparent !important; color: #2d3c49; }
+.wedding-panel { background: rgba(242, 245, 243,.92) !important; border: 1px solid rgba(111, 147, 172,.45) !important; box-shadow: 0 24px 48px -20px rgba(45, 60, 73,.25) !important; }
+.wedding-button { background: linear-gradient(#50728b,#3a4e5e) !important; color: #fff !important; border: 1px solid #a2babf !important; box-shadow: 0 10px 24px rgba(45, 60, 73,.28) !important; }
+.wedding-divider span { background-color: #6f93ac !important; }
+.wedding-divider i { color: #6f93ac !important; }
 
 /* ===== Theme navy v3 ===== */
 body.guest-theme::before { background-size: min(34vw, 200px) auto, min(26vw, 160px) auto, min(26vw, 160px) auto, min(34vw, 210px) auto; }
-body.guest-theme main:not([class*="bg-black"]):not([class*="bg-[#0"]):not([class*="bg-[#1"]):not([class*="bg-[#2a1d14"]) { background: transparent !important; }
+body.guest-theme main:not([class*="bg-black"]):not([class*="bg-[#0"]):not([class*="bg-[#1"]):not([class*="bg-[#212d36"]) { background: transparent !important; }
 body.guest-theme .wedding-page::before, body.guest-theme .wedding-page::after { background-image: none !important; }
 
 /* ===== Layar memuat ===== */
@@ -201,13 +201,45 @@ body.guest-theme .wedding-page::before, body.guest-theme .wedding-page::after { 
 .load-dots::after { content: ""; display: inline-block; width: 1.2em; text-align: left; animation: load-dots 1.4s steps(1) infinite; }
 
 /* ===== Tema Jawa ===== */
-::selection { background: #d9b983; color: #3d2b1f; }
+::selection { background: #9fb8bd; color: #2d3c49; }
 body.guest-theme::after { content: ""; position: fixed; inset: 0; z-index: 30; pointer-events: none; background-repeat: repeat-x, repeat-x;
   background-image: url(/references/parang-strip.svg), url(/references/parang-strip.svg); background-position: left top, left bottom; background-size: auto 10px, auto 10px; }
-body.guest-theme .wedding-panel, body.guest-theme [class*="border-[#e7dac4]"] { border-color: #c9a068 !important; background-image: url(/references/ceplok-tile.svg) !important; background-size: 60px 60px; }
-body.guest-theme .wedding-panel { border-radius: 1.2rem !important; box-shadow: 0 24px 48px -20px rgba(61,43,31,.3), inset 0 0 0 5px rgba(251,245,236,.9), inset 0 0 0 6px rgba(168,131,74,.5) !important; }
-body.guest-theme button[class*="bg-[#3d2b1f]"], body.guest-theme button[class*="bg-[#6b4b36]"] { background-image: linear-gradient(#7a5238, #4a2f1f) !important; border: 1px solid #d7b98a !important;
-  box-shadow: inset 0 0 0 2px rgba(241,226,189,.18), 0 10px 24px rgba(61,43,31,.3) !important; }
+body.guest-theme .wedding-panel, body.guest-theme [class*="border-[#cedadd]"] { border-color: #97b1c3 !important; background-image: url(/references/ceplok-tile.svg) !important; background-size: 60px 60px; }
+body.guest-theme .wedding-panel { border-radius: 1.2rem !important; box-shadow: 0 24px 48px -20px rgba(45, 60, 73,.3), inset 0 0 0 5px rgba(242, 245, 243,.9), inset 0 0 0 6px rgba(111, 147, 172,.5) !important; }
+body.guest-theme button[class*="bg-[#2d3c49]"], body.guest-theme button[class*="bg-[#4a6980]"] { background-image: linear-gradient(#50728b, #324351) !important; border: 1px solid #a2babf !important;
+  box-shadow: inset 0 0 0 2px rgba(208, 220, 222,.18), 0 10px 24px rgba(45, 60, 73,.3) !important; }
 body.guest-theme .font-serif { letter-spacing: .01em; }
-body.guest-theme .wedding-divider i { font-size: 0; width: 10px; height: 10px; background: #a8834a; transform: rotate(45deg); animation: none; }
+body.guest-theme .wedding-divider i { font-size: 0; width: 10px; height: 10px; background: #6f93ac; transform: rotate(45deg); animation: none; }
 
+
+
+/* ===== Tema Nuansa Jawa: biru kabut ===== */
+:root { --pb-blue: #6f8fa6; --pb-blue-deep: #3f566a; --pb-mist: #eef3f0; --pb-sage: #dfe8e4; --pb-mauve: #b0607f; --pb-taupe: #b9a58e; }
+html:has(body.guest-theme) { background-color: var(--pb-mist) !important; }
+body.guest-theme::before {
+  background-image: url(/references/gunungan.svg), url(/references/joglo.svg), url(/references/batik-tl.svg), url(/references/batik-tr.svg), linear-gradient(180deg, #f5f9f7 0%, #e3ece8 100%) !important;
+  background-repeat: no-repeat !important;
+  background-position: center 34%, center bottom, left top, right top, center !important;
+  background-size: min(62vw, 300px) auto, min(96vw, 520px) auto, min(34vw, 200px) auto, min(26vw, 160px) auto, cover !important;
+}
+body.guest-theme, .wedding-page { font-family: "Noto Serif", Georgia, serif; }
+button, input, textarea, select { font-family: inherit; }
+.font-script { font-family: "Great Vibes", "Pinyon Script", cursive; }
+.wedding-panel { border-radius: 1.6rem !important; }
+.wedding-divider i { color: var(--pb-mauve) !important; }
+
+
+/* ===== Desain Kejawen ===== */
+body.guest-theme::before {
+  background-image: url(/references/gunungan.svg), url(/references/joglo.svg), url(/references/batik-tl.svg), url(/references/batik-tr.svg), url(/references/kawung.svg), linear-gradient(180deg, #f5f9f7 0%, #e3ece8 100%) !important;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat, no-repeat !important;
+  background-position: center 34%, center bottom, left top, right top, 0 0, center !important;
+  background-size: min(62vw, 300px) auto, min(96vw, 520px) auto, min(34vw, 200px) auto, min(26vw, 160px) auto, 80px 80px, cover !important;
+}
+.wedding-panel { position: relative; border-radius: 2.6rem 2.6rem 1.4rem 1.4rem !important; outline: 1px solid rgba(111,147,172,.4); outline-offset: -9px; }
+.wedding-panel::before, .wedding-panel::after { content: ""; position: absolute; left: 1.8rem; right: 1.8rem; height: 12px; background: url(/references/tumpal.svg) repeat-x; pointer-events: none; }
+.wedding-panel::before { top: -1px; }
+.wedding-panel::after { bottom: -1px; transform: scaleY(-1); }
+.wedding-button { border: 3px double #b9a58e !important; }
+.wedding-divider i { font-size: 0 !important; display: inline-block; width: 22px; height: 22px; background: url(/references/lozenge.svg) center / contain no-repeat; }
+body.guest-theme main button[class*="rounded-[1.6rem]"] { outline: 1px solid rgba(111,147,172,.35); outline-offset: -7px; }

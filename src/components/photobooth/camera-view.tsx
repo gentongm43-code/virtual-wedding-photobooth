@@ -8,6 +8,9 @@ import {
   useState,
 } from "react";
 import { getPhotoFilterCss, type PhotoFilter } from "@/lib/image/photo-filter";
+import { tuneCameraTrack } from "@/lib/camera-tuning";
+import { STORY_RATIO, useCameraZoom } from "@/lib/camera-zoom";
+import ZoomControl from "./zoom-control";
 
 export type FacingMode = "user" | "environment";
 
@@ -77,6 +80,8 @@ const CameraView = forwardRef<CameraViewHandle, CameraViewProps>(
     facingRef.current = facingMode;
     const streamRef = useRef<MediaStream | null>(null);
     const [videoReady, setVideoReady] = useState(false);
+    const zoomApi = useCameraZoom();
+    const digitalRef = zoomApi.digitalRef;
 
     useImperativeHandle(ref, () => ({
       async captureFrame() {
@@ -86,8 +91,17 @@ const CameraView = forwardRef<CameraViewHandle, CameraViewProps>(
         }
 
         const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        // Ukuran cerita Instagram 9:16, dipotong dari tengah, sesuai zoom digital
+        const vw = video.videoWidth;
+        const vh = video.videoHeight;
+        const baseW = STORY_RATIO > vw / vh ? vw : vh * STORY_RATIO;
+        const baseH = STORY_RATIO > vw / vh ? vw / STORY_RATIO : vh;
+        const zoom = digitalRef.current;
+        const sw = baseW / zoom;
+        const sh = baseH / zoom;
+        const outScale = Math.min(1, 1920 / sh);
+        canvas.width = Math.round(sw * outScale);
+        canvas.height = Math.round(sh * outScale);
         const context = canvas.getContext("2d");
         if (!context) throw new Error("Canvas tidak tersedia.");
         context.imageSmoothingEnabled = true;
@@ -96,7 +110,7 @@ const CameraView = forwardRef<CameraViewHandle, CameraViewProps>(
           context.translate(canvas.width, 0);
           context.scale(-1, 1);
         }
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        context.drawImage(video, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, canvas.width, canvas.height);
 
         const probe = document.createElement("canvas");
         probe.width = 16;
@@ -191,6 +205,8 @@ const CameraView = forwardRef<CameraViewHandle, CameraViewProps>(
             return;
           }
           streamRef.current = stream;
+          tuneCameraTrack(stream);
+          zoomApi.attach(stream);
           const video = videoRef.current;
           if (!video) return;
           video.srcObject = stream;
@@ -237,16 +253,26 @@ const CameraView = forwardRef<CameraViewHandle, CameraViewProps>(
     const previewFilter = getPhotoFilterCss(filter);
 
     return (
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted
-        style={{ filter: previewFilter }}
-        className={`absolute left-1/2 top-1/2 max-h-full max-w-full -translate-x-1/2 -translate-y-1/2 object-contain ${
-          facingMode === "user" && mirror ? "-scale-x-100" : ""
-        } ${videoReady ? "opacity-100" : "opacity-0"}`}
-      />
+      <>
+        <div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-black"
+          style={{ aspectRatio: "9 / 16", width: "min(100vw, calc(100dvh * 9 / 16))" }}
+        >
+          <div className="absolute inset-0" style={{ transform: `scale(${zoomApi.digital})` }}>
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              style={{ filter: previewFilter }}
+              className={`absolute inset-0 h-full w-full object-cover ${facingMode === "user" && mirror ? "-scale-x-100" : ""} ${videoReady ? "opacity-100" : "opacity-0"}`}
+            />
+          </div>
+        </div>
+        <div data-noswipe className="absolute inset-x-0 bottom-[18.5rem] z-20 flex justify-center">
+          <ZoomControl options={zoomApi.options} value={zoomApi.zoom} onChange={zoomApi.change} />
+        </div>
+      </>
     );
   },
 );

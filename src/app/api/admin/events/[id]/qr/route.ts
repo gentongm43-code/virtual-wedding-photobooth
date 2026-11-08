@@ -10,7 +10,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   if (!event) return new NextResponse("Event tidak ditemukan.", { status: 404 });
   const searchParams = new URL(request.url).searchParams;
   const format = searchParams.get("format") === "svg" ? "svg" : "png";
-  const qrOptions = { errorCorrectionLevel: "H" as const, margin: 4, width: 1024, color: { dark: "#2b2927", light: "#ffffff" } };
+  const qrOptions = { errorCorrectionLevel: "H" as const, margin: 4, width: 1024, color: { dark: "#293743", light: "#ffffff" } };
   const url = getPublicEventUrl(event.slug, new URL(request.url).origin);
   const disposition = searchParams.get("download") === "1" ? "attachment" : "inline";
   if (format === "svg") {

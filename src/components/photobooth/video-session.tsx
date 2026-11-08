@@ -6,12 +6,15 @@ import FilterCarousel from "./filter-carousel";
 import { GuestBackButton } from "./guest-ui";
 import { createBoomerangVideo, type GuestMediaRecording } from "./guest-media-panel";
 import { DEFAULT_PHOTO_FILTER, getPhotoFilterCss, PHOTO_FILTER_OPTIONS, type PhotoFilter } from "@/lib/image/photo-filter";
+import { tuneCameraTrack } from "@/lib/camera-tuning";
+import { useCameraZoom } from "@/lib/camera-zoom";
+import ZoomControl from "./zoom-control";
 
 type Facing = "user" | "environment";
 type State = "starting" | "ready" | "countdown" | "recording" | "processing" | "error";
 
 const MAX_VIDEO_SECONDS = 120;
-const RATIO = 3 / 4;
+const RATIO = 9 / 16;
 const RING = 2 * Math.PI * 44;
 
 const wait = (ms: number) => new Promise<void>((resolve) => window.setTimeout(resolve, ms));
@@ -61,6 +64,8 @@ export default function VideoSession({ eventName, maxSeconds, boomerang = false,
   const mirrorRef = useRef(mirror);
   const facingRef = useRef(facing);
   filterRef.current = filter;
+  const zoomApi = useCameraZoom();
+  const digitalRef = zoomApi.digitalRef;
   mirrorRef.current = mirror;
   facingRef.current = facing;
 
@@ -87,6 +92,8 @@ export default function VideoSession({ eventName, maxSeconds, boomerang = false,
       window.clearTimeout(timeout);
       if (cancelled) { stream.getTracks().forEach((track) => track.stop()); return; }
       streamRef.current = stream;
+      tuneCameraTrack(stream);
+      zoomApi.attach(stream);
       const video = videoRef.current;
       if (!video) return;
       video.srcObject = stream;
@@ -122,9 +129,7 @@ export default function VideoSession({ eventName, maxSeconds, boomerang = false,
     const sourceRatio = video.videoWidth / video.videoHeight;
     const sw = RATIO > sourceRatio ? video.videoWidth : video.videoHeight * RATIO;
     const sh = RATIO > sourceRatio ? video.videoWidth / RATIO : video.videoHeight;
-    const sx = (video.videoWidth - sw) / 2;
-    const sy = (video.videoHeight - sh) / 2;
-    const scale = Math.min(1, 960 / sh);
+    const scale = Math.min(1, 1280 / sh);
     const width = Math.max(2, Math.round((sw * scale) / 2) * 2);
     const height = Math.max(2, Math.round((sh * scale) / 2) * 2);
     const canvas = document.createElement("canvas");
@@ -136,14 +141,17 @@ export default function VideoSession({ eventName, maxSeconds, boomerang = false,
       context.save();
       context.filter = getPhotoFilterCss(filterRef.current);
       if (facingRef.current === "user" && mirrorRef.current) { context.translate(width, 0); context.scale(-1, 1); }
-      context.drawImage(video, sx, sy, sw, sh, 0, 0, width, height);
+      const z = digitalRef.current;
+      const dw = sw / z;
+      const dh = sh / z;
+      context.drawImage(video, (video.videoWidth - dw) / 2, (video.videoHeight - dh) / 2, dw, dh, 0, 0, width, height);
       context.restore();
       rafRef.current = requestAnimationFrame(draw);
     };
     draw();
     const output = canvas.captureStream(30);
     stream.getAudioTracks().forEach((track) => output.addTrack(track));
-    const recorder = new MediaRecorder(output, { mimeType, videoBitsPerSecond: 2_000_000, audioBitsPerSecond: 96_000 });
+    const recorder = new MediaRecorder(output, { mimeType, videoBitsPerSecond: 3_500_000, audioBitsPerSecond: 96_000 });
     recorderRef.current = recorder;
     chunksRef.current = [];
     recorder.ondataavailable = (event) => { if (event.data.size) chunksRef.current.push(event.data); };
@@ -188,11 +196,11 @@ export default function VideoSession({ eventName, maxSeconds, boomerang = false,
   const progress = Math.min(1, elapsedMs / (limit * 1000));
 
   if (state === "error") {
-    return <main className="grid min-h-[100svh] place-items-center bg-[#2a1d14] px-6 text-[#f6eee0]">
+    return <main className="grid min-h-[100svh] place-items-center bg-[#212d36] px-6 text-[#e8eeeb]">
       <div className="w-full max-w-md rounded-[2rem] border border-white/10 bg-white/[.06] p-8 text-center">
         <h1 className="font-serif text-3xl">Kamera belum siap</h1>
         <p className="mt-3 text-sm leading-6 text-white/70">{message}</p>
-        <button type="button" onClick={() => setAttempt((value) => value + 1)} className="mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-[#f1e6d3] px-5 py-4 font-semibold text-[#3d2b1f]"><RotateCcw size={17} /> Coba lagi</button>
+        <button type="button" onClick={() => setAttempt((value) => value + 1)} className="mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-[#dee6e2] px-5 py-4 font-semibold text-[#2d3c49]"><RotateCcw size={17} /> Coba lagi</button>
         <button type="button" onClick={onBack} className="mt-3 w-full py-2 text-sm text-white/60">Kembali</button>
       </div>
     </main>;
@@ -212,20 +220,20 @@ export default function VideoSession({ eventName, maxSeconds, boomerang = false,
       const next = PHOTO_FILTER_OPTIONS[Math.min(PHOTO_FILTER_OPTIONS.length - 1, Math.max(0, index + (dx < 0 ? 1 : -1)))];
       if (next) setFilter(next.value);
     }}
-    className="fixed inset-0 flex flex-col overflow-hidden bg-[#151413] text-white"
+    className="fixed inset-0 flex flex-col overflow-hidden bg-[#192229] text-white"
     style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
   >
     <header className="relative z-10 flex shrink-0 items-center justify-between px-4 pb-2 pt-3">
       <GuestBackButton onClick={onBack} />
       <div className="text-center">
         <p className="max-w-[220px] truncate font-serif text-lg tracking-wide">{eventName}</p>
-        <p className="mt-1 text-[10px] uppercase tracking-[0.28em] text-[#f1e6d3]/80">{boomerang ? "Boomerang" : "Video"} · maks. {limitLabel(limit)}</p>
+        <p className="mt-1 text-[10px] uppercase tracking-[0.28em] text-[#dee6e2]/80">{boomerang ? "Boomerang" : "Video"} · maks. {limitLabel(limit)}</p>
       </div>
       <span className="h-11 w-11" aria-hidden="true" />
     </header>
     <div className="relative min-h-0 flex-1" style={{ containerType: "size" }}>
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[1.5rem] bg-black ring-1 ring-white/15" style={{ width: "min(100cqw, 75cqh)", aspectRatio: "3 / 4" }}>
-        <video ref={videoRef} autoPlay playsInline muted style={{ filter: getPhotoFilterCss(filter) }} className={`absolute inset-0 h-full w-full object-cover ${facing === "user" && mirror ? "-scale-x-100" : ""} ${state === "starting" ? "opacity-0" : "opacity-100"}`} />
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[1.5rem] bg-black ring-1 ring-white/15" style={{ width: "min(100cqw, 56.25cqh)", aspectRatio: "9 / 16" }}>
+        <div className="absolute inset-0" style={{ transform: `scale(${zoomApi.digital})` }}><video ref={videoRef} autoPlay playsInline muted style={{ filter: getPhotoFilterCss(filter) }} className={`absolute inset-0 h-full w-full object-cover ${facing === "user" && mirror ? "-scale-x-100" : ""} ${state === "starting" ? "opacity-0" : "opacity-100"}`} /></div>
         <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/50 to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/75 to-transparent" />
         {recording && <div className="absolute left-1/2 top-3 z-10 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/55 px-4 py-1.5 text-xs font-semibold tracking-[0.15em] backdrop-blur"><span className="guest-pulse h-2.5 w-2.5 rounded-full bg-red-400" /> REC {clock(elapsedMs)} / {clock(limit * 1000)}</div>}
@@ -234,6 +242,7 @@ export default function VideoSession({ eventName, maxSeconds, boomerang = false,
           {countdown !== null && <span key={countdown} className="count-pop font-serif text-[7rem] leading-none drop-shadow-2xl">{countdown}</span>}
           {state === "processing" && <p className="rounded-full bg-black/60 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em]">Memproses video…</p>}
         </div>
+        <div data-noswipe className="absolute inset-x-0 bottom-[6.5rem] z-20 flex justify-center"><ZoomControl options={zoomApi.options} value={zoomApi.zoom} onChange={zoomApi.change} /></div>
         <div className="absolute inset-x-0 bottom-2 z-10"><FilterCarousel value={filter} onChange={setFilter} /></div>
       </div>
     </div>
@@ -246,12 +255,12 @@ export default function VideoSession({ eventName, maxSeconds, boomerang = false,
         <button type="button" disabled={!ready && !recording} onClick={() => recording ? stopRecording() : void startRecording()} aria-label={recording ? "Hentikan rekaman" : "Mulai merekam"} className="relative grid h-20 w-20 place-items-center rounded-full transition active:scale-95 disabled:opacity-40">
           <svg viewBox="0 0 100 100" className="absolute inset-0 -rotate-90">
             <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,.35)" strokeWidth="6" />
-            <circle cx="50" cy="50" r="44" fill="none" stroke="#f1e6d3" strokeWidth="6" strokeLinecap="round" strokeDasharray={RING} strokeDashoffset={RING * (1 - (recording ? progress : 0))} />
+            <circle cx="50" cy="50" r="44" fill="none" stroke="#dee6e2" strokeWidth="6" strokeLinecap="round" strokeDasharray={RING} strokeDashoffset={RING * (1 - (recording ? progress : 0))} />
           </svg>
           <span className={`block bg-red-500 transition-all ${recording ? "h-7 w-7 rounded-md" : "h-14 w-14 rounded-full"}`} />
         </button>
         <button type="button" onClick={() => setMirror((value) => !value)} disabled={!ready || facing !== "user"} aria-pressed={mirror} aria-label="Balik cermin" className="flex w-20 flex-col items-center gap-1.5 text-center text-[11px] font-semibold leading-tight transition active:scale-95 disabled:opacity-40">
-          <span className={`grid h-12 w-12 place-items-center rounded-full border backdrop-blur ${mirror ? "border-[#f1e6d3] bg-[#f1e6d3] text-[#3d2b1f]" : "border-white/20 bg-black/45"}`}>⇋</span>{facing === "user" ? (mirror ? "Mirror Aktif" : "Mirror Mati") : "Mirror"}
+          <span className={`grid h-12 w-12 place-items-center rounded-full border backdrop-blur ${mirror ? "border-[#dee6e2] bg-[#dee6e2] text-[#2d3c49]" : "border-white/20 bg-black/45"}`}>⇋</span>{facing === "user" ? (mirror ? "Mirror Aktif" : "Mirror Mati") : "Mirror"}
         </button>
       </div>
     </footer>

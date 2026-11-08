@@ -47,9 +47,9 @@ export const DEFAULT_TEMPLATE: NormalizedTemplateConfig = {
   logo: null,
   photoSlots: [{ x: 70, y: 105, width: 940, height: 900 }],
   texts: [
-    { text: "{{eventName}}", x: 540, y: 1120, align: "center", fontSize: 48, color: "#3d2b1f" },
-    { text: "{{eventDate}}", x: 540, y: 1180, align: "center", fontSize: 32, color: "#6b4b36" },
-    { text: "{{location}}", x: 540, y: 1230, align: "center", fontSize: 26, color: "#8c7260" },
+    { text: "{{eventName}}", x: 540, y: 1120, align: "center", fontSize: 48, color: "#2d3c49" },
+    { text: "{{eventDate}}", x: 540, y: 1180, align: "center", fontSize: 32, color: "#4a6980" },
+    { text: "{{location}}", x: 540, y: 1230, align: "center", fontSize: 26, color: "#6b90aa" },
   ],
 };
 

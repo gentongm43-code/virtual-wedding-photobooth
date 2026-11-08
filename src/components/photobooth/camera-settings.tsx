@@ -24,7 +24,7 @@ function Row({ title, children }: { title: string; children: ReactNode }) {
 
 function Switch({ on, onChange }: { on: boolean; onChange: (value: boolean) => void }) {
   return <button type="button" aria-pressed={on} onClick={() => onChange(!on)} className="flex h-12 w-full items-center gap-3 rounded-xl border border-white/10 bg-white/[.06] px-4 transition active:scale-[.98]">
-    <span className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${on ? "bg-[#f1e6d3]" : "bg-white/20"}`}><span className={`absolute top-0.5 h-5 w-5 rounded-full transition-all ${on ? "left-[22px] bg-[#151413]" : "left-0.5 bg-white"}`} /></span>
+    <span className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${on ? "bg-[#dee6e2]" : "bg-white/20"}`}><span className={`absolute top-0.5 h-5 w-5 rounded-full transition-all ${on ? "left-[22px] bg-[#192229]" : "left-0.5 bg-white"}`} /></span>
     <span className="text-xs font-semibold tracking-[0.2em] text-white/75">{on ? "AKTIF" : "MATI"}</span>
   </button>;
 }
@@ -33,7 +33,7 @@ const selectClass = "h-12 w-full appearance-none rounded-xl border border-white/
 
 export default function CameraSettingsSheet(p: Props) {
   return <div className="absolute inset-0 z-30 flex flex-col justify-end bg-black/55" onClick={p.onClose}>
-    <div onClick={(event) => event.stopPropagation()} className="sheet-up rounded-t-[1.75rem] border-t border-white/10 bg-[#2a1d14]/95 px-5 pb-[calc(20px+env(safe-area-inset-bottom))] pt-3 text-white backdrop-blur-xl">
+    <div onClick={(event) => event.stopPropagation()} className="sheet-up rounded-t-[1.75rem] border-t border-white/10 bg-[#212d36]/95 px-5 pb-[calc(20px+env(safe-area-inset-bottom))] pt-3 text-white backdrop-blur-xl">
       <span className="mx-auto mb-4 block h-1 w-10 rounded-full bg-white/25" />
       <div className="mb-5 flex items-center justify-between">
         <h2 className="font-serif text-xl">Pengaturan Kamera</h2>
@@ -57,9 +57,9 @@ export default function CameraSettingsSheet(p: Props) {
             <option value={10}>10 detik</option>
           </select>
         </Row>
-        <Row title="Kualitas"><div className="flex h-12 items-center rounded-xl border border-white/10 bg-white/[.06] px-4 text-sm text-[#f1e6d3]">Terbaik (HD)</div></Row>
+        <Row title="Kualitas"><div className="flex h-12 items-center rounded-xl border border-white/10 bg-white/[.06] px-4 text-sm text-[#dee6e2]">Terbaik (HD)</div></Row>
       </div>
-      <button type="button" onClick={p.onClose} className="mt-6 h-12 w-full rounded-full bg-[#f1e6d3] text-sm font-semibold text-[#3d2b1f] transition active:scale-[.98]">Selesai</button>
+      <button type="button" onClick={p.onClose} className="mt-6 h-12 w-full rounded-full bg-[#dee6e2] text-sm font-semibold text-[#2d3c49] transition active:scale-[.98]">Selesai</button>
     </div>
   </div>;
 }

@@ -16,8 +16,8 @@ export function Corners() {
 
 export function Rings() {
   return (
-    <svg viewBox="0 0 80 56" className="h-8 w-12" fill="none" stroke="#a8834a" strokeWidth="2.5">
-      <path d="M40 3C51 17 62 29 62 52H18C18 29 29 17 40 3Z" /><path d="M40 22V52" /><path d="M40 29Q48 35 40 43Q32 35 40 29Z" fill="#a8834a" />
+    <svg viewBox="0 0 80 56" className="h-8 w-12" fill="none" stroke="#6f93ac" strokeWidth="2.5">
+      <path d="M40 3C51 17 62 29 62 52H18C18 29 29 17 40 3Z" /><path d="M40 22V52" /><path d="M40 29Q48 35 40 43Q32 35 40 29Z" fill="#6f93ac" />
     </svg>
   );
 }
@@ -26,9 +26,9 @@ export function GuestHeader() {
   return (
     <div>
       <div className="flex items-center justify-center gap-3">
-        <span className="h-px w-14 bg-[#a8834a]/50 sm:w-28" /><Rings /><span className="h-px w-14 bg-[#a8834a]/50 sm:w-28" />
+        <span className="h-px w-14 bg-[#6f93ac]/50 sm:w-28" /><Rings /><span className="h-px w-14 bg-[#6f93ac]/50 sm:w-28" />
       </div>
-      <p className="mt-1 text-center text-[10px] font-semibold uppercase tracking-[0.34em] text-[#3d2b1f] sm:text-xs">Photobooth Pawiwahan</p>
+      <p className="mt-1 text-center text-[10px] font-semibold uppercase tracking-[0.34em] text-[#2d3c49] sm:text-xs">Photobooth Pawiwahan</p>
     </div>
   );
 }
@@ -38,8 +38,8 @@ export function Stepper({ current }: { current: 1 | 2 | 3 }) {
     <div className="flex items-center gap-2" aria-label={`Langkah ${current} dari 3`}>
       {[1, 2, 3].map((n, i) => (
         <Fragment key={n}>
-          {i > 0 && <span className="h-px flex-1 bg-[#a8834a]/55" />}
-          <span className={`grid h-9 w-9 place-items-center rounded-full border text-sm font-semibold ${n === current ? "border-[#3d2b1f] bg-[#3d2b1f] text-white shadow-sm" : n < current ? "border-[#3d2b1f] bg-[#f1e6d3] text-[#3d2b1f]" : "border-[#c9a068] bg-[#fcf4ea] text-[#3d2b1f]"}`}>{n}</span>
+          {i > 0 && <span className="h-px flex-1 bg-[#6f93ac]/55" />}
+          <span className={`grid h-9 w-9 place-items-center rounded-full border text-sm font-semibold ${n === current ? "border-[#2d3c49] bg-[#2d3c49] text-white shadow-sm" : n < current ? "border-[#2d3c49] bg-[#dee6e2] text-[#2d3c49]" : "border-[#97b1c3] bg-[#f1f5f3] text-[#2d3c49]"}`}>{n}</span>
         </Fragment>
       ))}
     </div>
@@ -48,10 +48,10 @@ export function Stepper({ current }: { current: 1 | 2 | 3 }) {
 
 export function GoldDivider() {
   return (
-    <div className="mx-auto flex w-full max-w-[460px] items-center gap-3 text-[#a8834a]">
-      <span className="h-px flex-1 bg-gradient-to-r from-transparent to-[#a8834a]/70" />
+    <div className="mx-auto flex w-full max-w-[460px] items-center gap-3 text-[#6f93ac]">
+      <span className="h-px flex-1 bg-gradient-to-r from-transparent to-[#6f93ac]/70" />
       <span className="text-sm">✦</span>
-      <span className="h-px flex-1 bg-gradient-to-l from-transparent to-[#a8834a]/70" />
+      <span className="h-px flex-1 bg-gradient-to-l from-transparent to-[#6f93ac]/70" />
     </div>
   );
 }

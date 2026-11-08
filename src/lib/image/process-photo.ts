@@ -88,7 +88,7 @@ export async function processPhoto({ original, template, variables, photoIndex, 
       const resolved = resolveTemplateText(item.text, variables);
       const fit = fitTemplateText(item, resolved, width);
       const anchor = fit.align === "left" ? "start" : fit.align === "right" ? "end" : "middle";
-      return `<text x="${item.x}" y="${item.y}" text-anchor="${anchor}" fill="${escapeXml(item.color ?? "#332b27")}" font-family="${escapeXml(item.fontFamily ?? "Arial")}" font-size="${fit.fontSize}" font-weight="600">${escapeXml(resolved)}</text>`;
+      return `<text x="${item.x}" y="${item.y}" text-anchor="${anchor}" fill="${escapeXml(item.color ?? "#2c3b48")}" font-family="${escapeXml(item.fontFamily ?? "Arial")}" font-size="${fit.fontSize}" font-weight="600">${escapeXml(resolved)}</text>`;
     }).join("")}</svg>`;
     composites.push({ input: Buffer.from(textSvg), left: 0, top: 0 });
   }
@@ -99,6 +99,6 @@ export async function processPhoto({ original, template, variables, photoIndex, 
       top: 0,
     });
   }
-  const base = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#f5ede7"/></svg>`);
+  const base = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#ecf0ee"/></svg>`);
   return sharp(base).composite(composites).jpeg({ quality: 95, chromaSubsampling: "4:4:4" }).toBuffer();
 }

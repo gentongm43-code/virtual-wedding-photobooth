@@ -16,8 +16,8 @@ const tabs: { id: Tab; label: string }[] = [
   { id: "photobooth", label: "Photobooth" },
 ];
 
-const inputClass = "mt-1.5 w-full rounded-xl border border-[#e3d8cf] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#b99261]";
-const labelClass = "block text-[13px] font-medium text-[#5f554e]";
+const inputClass = "mt-1.5 w-full rounded-xl border border-[#d2dee0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#88a6bb]";
+const labelClass = "block text-[13px] font-medium text-[#4e7088]";
 const cleanValue = (value?: string) => { const text = value ?? ""; return text.includes("picsum.photos") || /assets\/images\/(cowo|cewe)\.webp$/.test(text) ? "" : text; };
 
 const groups: { title: string; keys: string[] }[] = [
@@ -49,12 +49,12 @@ const allGroups = leftoverKeys.length ? [...groups, { title: "Lainnya", keys: le
 
 function ToggleRow({ name, label, hint, defaultChecked }: { name: string; label: string; hint: string; defaultChecked: boolean }) {
   return (
-    <label className="flex items-center justify-between gap-4 rounded-2xl border border-[#eee3d9] bg-[#fffdfa] px-4 py-3.5">
+    <label className="flex items-center justify-between gap-4 rounded-2xl border border-[#e0e7e3] bg-[#f8faf9] px-4 py-3.5">
       <span>
-        <span className="block text-sm font-medium text-[#302b28]">{label}</span>
-        <span className="block text-xs text-[#9a8d83]">{hint}</span>
+        <span className="block text-sm font-medium text-[#2b3a46]">{label}</span>
+        <span className="block text-xs text-[#8aa7bc]">{hint}</span>
       </span>
-      <input type="checkbox" name={name} defaultChecked={defaultChecked} className="h-5 w-5 shrink-0 accent-[#b99261]" />
+      <input type="checkbox" name={name} defaultChecked={defaultChecked} className="h-5 w-5 shrink-0 accent-[#88a6bb]" />
     </label>
   );
 }
@@ -89,9 +89,9 @@ export default function EventForm({ templates, initial }: { templates: TemplateO
 
   return (
     <form ref={formRef} onSubmit={submit} noValidate>
-      <div className="grid grid-cols-3 gap-1 rounded-2xl bg-[#f3ece4] p-1" role="tablist">
+      <div className="grid grid-cols-3 gap-1 rounded-2xl bg-[#e9eeec] p-1" role="tablist">
         {tabs.map(({ id, label }) => (
-          <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`rounded-xl px-3 py-2.5 text-sm font-semibold transition ${tab === id ? "bg-white text-[#302b28] shadow-sm" : "text-[#8e837b]"}`}>
+          <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`rounded-xl px-3 py-2.5 text-sm font-semibold transition ${tab === id ? "bg-white text-[#2b3a46] shadow-sm" : "text-[#7d9db4]"}`}>
             {label}
           </button>
         ))}
@@ -101,29 +101,29 @@ export default function EventForm({ templates, initial }: { templates: TemplateO
         <div className="grid gap-4 sm:grid-cols-2">
           <label className={labelClass}>Nama event<input name="name" required defaultValue={initial?.name} className={inputClass} placeholder="Nama pasangan" /></label>
           <label className={labelClass}>Slug (link tamu)<input name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required={Boolean(initial)} defaultValue={initial?.slug} className={inputClass} placeholder="putri-mahfud" />
-            {!initial && <span className="mt-1 block text-xs font-normal text-[#a08f84]">Kosongkan agar dibuat otomatis dari nama.</span>}
+            {!initial && <span className="mt-1 block text-xs font-normal text-[#8eaabe]">Kosongkan agar dibuat otomatis dari nama.</span>}
           </label>
           <label className={labelClass}>Tanggal<input name="date" required type="date" defaultValue={initial?.date} className={inputClass} /></label>
           <label className={labelClass}>Lokasi<input name="location" defaultValue={initial?.location ?? ""} className={inputClass} placeholder="Kota / venue" /></label>
           <label className={`${labelClass} sm:col-span-2`}>Deskripsi undangan<textarea name="description" defaultValue={initial?.description ?? ""} rows={3} className={inputClass} placeholder="Cerita singkat untuk tamu" /></label>
           <label className={labelClass}>URL cover / foto photobooth<input name="coverImage" type="url" defaultValue={initial?.coverImage ?? ""} className={inputClass} placeholder="https://..." /></label>
           <label className={labelClass}>URL logo<input name="logo" type="url" defaultValue={initial?.logo ?? ""} className={inputClass} placeholder="https://..." /></label>
-          <label className={labelClass}>Warna utama<input name="primaryColor" type="color" defaultValue={initial?.primaryColor ?? "#2b2927"} className="mt-1.5 h-11 w-full cursor-pointer rounded-xl border border-[#e3d8cf] bg-white p-1" /></label>
-          <label className={labelClass}>Warna sekunder<input name="secondaryColor" type="color" defaultValue={initial?.secondaryColor ?? "#e6cdbd"} className="mt-1.5 h-11 w-full cursor-pointer rounded-xl border border-[#e3d8cf] bg-white p-1" /></label>
+          <label className={labelClass}>Warna utama<input name="primaryColor" type="color" defaultValue={initial?.primaryColor ?? "#293743"} className="mt-1.5 h-11 w-full cursor-pointer rounded-xl border border-[#d2dee0] bg-white p-1" /></label>
+          <label className={labelClass}>Warna sekunder<input name="secondaryColor" type="color" defaultValue={initial?.secondaryColor ?? "#c9d7da"} className="mt-1.5 h-11 w-full cursor-pointer rounded-xl border border-[#d2dee0] bg-white p-1" /></label>
         </div>
       </div>
 
       <div data-tab="undangan" hidden={tab !== "undangan"} className="mt-5 space-y-2.5">
-        <p className="px-1 text-xs text-[#9a8d83]">Ketuk bagian untuk membuka dan mengedit isinya.</p>
+        <p className="px-1 text-xs text-[#8aa7bc]">Ketuk bagian untuk membuka dan mengedit isinya.</p>
         {allGroups.map(({ title, keys }, index) => {
           const filled = keys.filter((key) => cleanValue(invitation[key]).trim()).length;
           return (
-            <details key={title} open={index === 0 || undefined} className="group rounded-2xl border border-[#eee3d9] bg-[#fffdfa]">
+            <details key={title} open={index === 0 || undefined} className="group rounded-2xl border border-[#e0e7e3] bg-[#f8faf9]">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5 [&::-webkit-details-marker]:hidden">
-                <span className="text-sm font-semibold text-[#302b28]">{title}</span>
-                <span className="flex items-center gap-2 text-xs text-[#a59689]">{filled}/{keys.length} terisi<ChevronDown size={16} className="transition group-open:rotate-180" /></span>
+                <span className="text-sm font-semibold text-[#2b3a46]">{title}</span>
+                <span className="flex items-center gap-2 text-xs text-[#95afc2]">{filled}/{keys.length} terisi<ChevronDown size={16} className="transition group-open:rotate-180" /></span>
               </summary>
-              <div className="grid gap-4 border-t border-[#f0e7de] px-4 py-4 sm:grid-cols-2">
+              <div className="grid gap-4 border-t border-[#e4eae7] px-4 py-4 sm:grid-cols-2">
                 {keys.map((key) => {
                   const field = fieldMap.get(key);
                   if (!field) return null;
@@ -149,21 +149,21 @@ export default function EventForm({ templates, initial }: { templates: TemplateO
           <label className={labelClass}>Template frame<select name="templateId" defaultValue={initial?.templateId ?? ""} className={inputClass}><option value="">Tanpa template</option>{templates.map((template) => <option value={template.id} key={template.id}>{template.name}</option>)}</select></label>
           <label className={labelClass}>Jumlah foto<select name="photoLimit" defaultValue={String(initial?.photoLimit ?? 1)} className={inputClass}>{[1, 2, 3, 4].map((n) => <option key={n} value={n}>{n} foto</option>)}</select></label>
         </div>
-        <Link href="/admin/templates" className="inline-flex w-fit rounded-xl border border-[#e3d8cf] px-3 py-2 text-xs font-semibold text-[#786f68]">Kelola frame →</Link>
+        <Link href="/admin/templates" className="inline-flex w-fit rounded-xl border border-[#d2dee0] px-3 py-2 text-xs font-semibold text-[#638aa6]">Kelola frame →</Link>
 
-        <div className="rounded-2xl border border-[#eee3d9] bg-[#fffdfa] px-4 py-3.5">
+        <div className="rounded-2xl border border-[#e0e7e3] bg-[#f8faf9] px-4 py-3.5">
           <label className="flex items-center justify-between gap-4">
-            <span><span className="block text-sm font-medium text-[#302b28]">Izinkan video</span><span className="block text-xs text-[#9a8d83]">Tamu bisa merekam video singkat.</span></span>
-            <input type="checkbox" name="allowVideo" defaultChecked={initial?.allowVideo ?? true} className="h-5 w-5 shrink-0 accent-[#b99261]" />
+            <span><span className="block text-sm font-medium text-[#2b3a46]">Izinkan video</span><span className="block text-xs text-[#8aa7bc]">Tamu bisa merekam video singkat.</span></span>
+            <input type="checkbox" name="allowVideo" defaultChecked={initial?.allowVideo ?? true} className="h-5 w-5 shrink-0 accent-[#88a6bb]" />
           </label>
-          <div className="mt-3 flex items-center gap-2 text-xs text-[#8f837b]">Durasi maksimal <input name="videoDuration" type="number" min="1" max="120" defaultValue={initial?.videoDuration ?? 120} className="w-20 rounded-lg border border-[#e3d8cf] px-3 py-2 text-sm text-[#302b28]" aria-label="Durasi video (detik)" /> detik</div>
+          <div className="mt-3 flex items-center gap-2 text-xs text-[#7e9eb5]">Durasi maksimal <input name="videoDuration" type="number" min="1" max="120" defaultValue={initial?.videoDuration ?? 120} className="w-20 rounded-lg border border-[#d2dee0] px-3 py-2 text-sm text-[#2b3a46]" aria-label="Durasi video (detik)" /> detik</div>
         </div>
-        <div className="rounded-2xl border border-[#eee3d9] bg-[#fffdfa] px-4 py-3.5">
+        <div className="rounded-2xl border border-[#e0e7e3] bg-[#f8faf9] px-4 py-3.5">
           <label className="flex items-center justify-between gap-4">
-            <span><span className="block text-sm font-medium text-[#302b28]">Izinkan voice note</span><span className="block text-xs text-[#9a8d83]">Tamu bisa merekam pesan suara.</span></span>
-            <input type="checkbox" name="allowVoiceNote" defaultChecked={initial?.allowVoiceNote ?? true} className="h-5 w-5 shrink-0 accent-[#b99261]" />
+            <span><span className="block text-sm font-medium text-[#2b3a46]">Izinkan voice note</span><span className="block text-xs text-[#8aa7bc]">Tamu bisa merekam pesan suara.</span></span>
+            <input type="checkbox" name="allowVoiceNote" defaultChecked={initial?.allowVoiceNote ?? true} className="h-5 w-5 shrink-0 accent-[#88a6bb]" />
           </label>
-          <div className="mt-3 flex items-center gap-2 text-xs text-[#8f837b]">Durasi maksimal <input name="voiceNoteDuration" type="number" min="1" max="600" defaultValue={initial?.voiceNoteDuration ?? 60} className="w-20 rounded-lg border border-[#e3d8cf] px-3 py-2 text-sm text-[#302b28]" aria-label="Durasi voice note (detik)" /> detik</div>
+          <div className="mt-3 flex items-center gap-2 text-xs text-[#7e9eb5]">Durasi maksimal <input name="voiceNoteDuration" type="number" min="1" max="600" defaultValue={initial?.voiceNoteDuration ?? 60} className="w-20 rounded-lg border border-[#d2dee0] px-3 py-2 text-sm text-[#2b3a46]" aria-label="Durasi voice note (detik)" /> detik</div>
         </div>
         <ToggleRow name="allowMessage" label="Izinkan ucapan" hint="Tamu bisa menulis ucapan." defaultChecked={Boolean(initial?.allowMessage)} />
         <ToggleRow name="allowPublicGallery" label="Galeri publik" hint="Tamu bisa melihat galeri event." defaultChecked={initial?.allowPublicGallery ?? true} />
@@ -173,7 +173,7 @@ export default function EventForm({ templates, initial }: { templates: TemplateO
 
       <div className="sticky bottom-20 z-10 mt-6 md:bottom-4">
         {error && <p className="mb-2 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
-        <button disabled={saving} className="w-full rounded-xl bg-[#302b28] px-4 py-3.5 font-semibold text-white shadow-[0_8px_24px_rgba(48,43,40,0.25)] transition hover:bg-[#4a423d] disabled:opacity-60">{saving ? "Menyimpan..." : initial ? "Simpan perubahan" : "Simpan event"}</button>
+        <button disabled={saving} className="w-full rounded-xl bg-[#2b3a46] px-4 py-3.5 font-semibold text-white shadow-[0_8px_24px_rgba(43,58,70,0.25)] transition hover:bg-[#3d5264] disabled:opacity-60">{saving ? "Menyimpan..." : initial ? "Simpan perubahan" : "Simpan event"}</button>
       </div>
     </form>
   );
