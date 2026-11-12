@@ -33,7 +33,7 @@ type Props = {
   allowMessage: boolean;
   initialItems?: GuestMediaItem[];
   startInReview?: boolean;
-  videoCaptureMode?: "normal" | "boomerang" | "live-photo";
+  videoCaptureMode?: "normal" | "live-photo";
 };
 type Item = GuestMediaItem;
 
@@ -74,85 +74,6 @@ function mimeFor(mode: "video" | "voice") {
       return false;
     }
   }) ?? "";
-}
-
-export async function createBoomerangVideo(blob: Blob, knownSeconds: number): Promise<{ blob: Blob; mimeType: string; durationMs: number }> {
-  if (typeof MediaRecorder === "undefined" || typeof HTMLCanvasElement === "undefined") {
-    throw new Error("Boomerang tidak didukung di browser ini.");
-  }
-  const mimeType = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm", "video/mp4"].find((type) => MediaRecorder.isTypeSupported(type)) ?? "";
-  if (!mimeType || !("captureStream" in HTMLCanvasElement.prototype)) {
-    throw new Error("Boomerang tidak didukung di browser ini.");
-  }
-  const objectUrl = URL.createObjectURL(blob);
-  const source = document.createElement("video");
-  source.src = objectUrl;
-  source.muted = true;
-  source.playsInline = true;
-  source.preload = "auto";
-
-  try {
-    await new Promise<void>((resolve, reject) => {
-      source.onloadedmetadata = () => resolve();
-      source.onerror = () => reject(new Error("Gagal memuat video untuk boomerang."));
-    });
-
-    const sourceSeconds = Number.isFinite(source.duration) && source.duration > 0 ? source.duration : knownSeconds;
-    if (!Number.isFinite(sourceSeconds) || sourceSeconds <= 0) {
-      throw new Error("Durasi video tidak valid.");
-    }
-
-    const width = source.videoWidth || 720;
-    const height = source.videoHeight || 1280;
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const context = canvas.getContext("2d");
-    if (!context) throw new Error("Canvas tidak didukung.");
-
-    const stream = canvas.captureStream(30);
-    const recorder = new MediaRecorder(stream, { mimeType });
-    const chunks: Blob[] = [];
-    const totalSeconds = Math.max(sourceSeconds * 2, 1.5);
-    const startTime = performance.now();
-
-    const finalResult = await new Promise<{ blob: Blob; durationMs: number }>((resolve, reject) => {
-      recorder.ondataavailable = (event) => {
-        if (event.data.size) chunks.push(event.data);
-      };
-      recorder.onerror = () => reject(new Error("Perekaman boomerang gagal."));
-      recorder.onstop = () => resolve({
-        blob: new Blob(chunks, { type: mimeType }),
-        durationMs: Math.max(800, Math.round(totalSeconds * 1000)),
-      });
-      recorder.start(250);
-
-      const render = () => {
-        const elapsed = (performance.now() - startTime) / 1000;
-        if (elapsed >= totalSeconds) {
-          recorder.stop();
-          return;
-        }
-
-        const playhead = elapsed <= sourceSeconds ? elapsed : Math.max(0, totalSeconds - elapsed);
-        if (Math.abs(source.currentTime - playhead) > 0.08) source.currentTime = playhead;
-        context.drawImage(source, 0, 0, canvas.width, canvas.height);
-        requestAnimationFrame(render);
-      };
-
-      void source.play().catch(() => {
-        recorder.stop();
-        reject(new Error("Autoplay boomerang dibatasi browser."));
-      });
-      requestAnimationFrame(render);
-    });
-
-    return { blob: finalResult.blob, mimeType, durationMs: finalResult.durationMs };
-  } finally {
-    source.pause();
-    source.src = "";
-    URL.revokeObjectURL(objectUrl);
-  }
 }
 
 function SuccessPhoto({ photos, template, eventName, eventDate, location }: { photos: { blob: Blob }[]; template: Parameters<typeof PhotoPreview>[0]["template"]; eventName: string; eventDate: string; location?: string | null }) {
@@ -220,8 +141,7 @@ export default function GuestMediaPanel({
   const timerRef = useRef<number | null>(null);
   const itemsRef = useRef<Item[]>([]);
 
-  const boomerangSeconds = Math.max(1, Math.min(3, Math.floor(videoDuration / 2)));
-  const videoLimit = videoCaptureMode === "boomerang" ? boomerangSeconds : videoDuration;
+  const videoLimit = videoDuration;
 
   const options: { mode: Mode; label: string; description: string; enabled: boolean }[] = [
     { mode: "video", label: "Video", description: videoLimit >= 60 && videoLimit % 60 === 0 ? `Maks. ${videoLimit / 60} menit` : `Maks. ${videoLimit} detik`, enabled: allowVideo },
@@ -331,25 +251,7 @@ export default function GuestMediaPanel({
         const durationMs = Math.min(Math.max(1, Date.now() - startedRef.current), limitSeconds * 1000);
         const baseBlob = new Blob(chunksRef.current, { type: mimeType });
 
-        void (async () => {
-          try {
-            let finalBlob = baseBlob;
-            let finalMimeType = mimeType;
-            let finalDurationMs = durationMs;
-
-            if (mode === "video" && videoCaptureMode === "boomerang") {
-              const boomerang = await createBoomerangVideo(baseBlob, durationMs / 1000);
-              finalBlob = boomerang.blob;
-              finalMimeType = boomerang.mimeType;
-              finalDurationMs = boomerang.durationMs;
-            }
-
-            updateItem(mode, { recording: { mode, blob: finalBlob, mimeType: finalMimeType, durationMs: finalDurationMs, url: URL.createObjectURL(finalBlob) } });
-          } catch {
-            setError("Boomerang belum didukung di perangkat ini.");
-            updateItem(mode, { recording: { mode, blob: baseBlob, mimeType, durationMs, url: URL.createObjectURL(baseBlob) } });
-          }
-        })();
+        updateItem(mode, { recording: { mode, blob: baseBlob, mimeType, durationMs, url: URL.createObjectURL(baseBlob) } });
       };
       recorder.start(250);
       const maxSeconds = mode === "video" ? videoLimit : voiceNoteDuration;

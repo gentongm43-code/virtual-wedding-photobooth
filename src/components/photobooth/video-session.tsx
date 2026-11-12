@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { RotateCcw, SwitchCamera } from "lucide-react";
 import FilterCarousel from "./filter-carousel";
 import { GuestBackButton } from "./guest-ui";
-import { createBoomerangVideo, type GuestMediaRecording } from "./guest-media-panel";
+import { type GuestMediaRecording } from "./guest-media-panel";
 import { DEFAULT_PHOTO_FILTER, getPhotoFilterCss, PHOTO_FILTER_OPTIONS, type PhotoFilter } from "@/lib/image/photo-filter";
 import { tuneCameraTrack } from "@/lib/camera-tuning";
 import { useCameraZoom } from "@/lib/camera-zoom";
@@ -35,10 +35,9 @@ function describeError(error: unknown) {
   return "Kamera tidak dapat digunakan saat ini.";
 }
 
-export default function VideoSession({ eventName, maxSeconds, boomerang = false, onBack, onComplete }: {
+export default function VideoSession({ eventName, maxSeconds, onBack, onComplete }: {
   eventName: string;
   maxSeconds: number;
-  boomerang?: boolean;
   onBack: () => void;
   onComplete: (recording: GuestMediaRecording) => void;
 }) {
@@ -164,21 +163,7 @@ export default function VideoSession({ eventName, maxSeconds, boomerang = false,
       const durationMs = Math.min(Math.max(1, Date.now() - startedRef.current), limit * 1000);
       const base = new Blob(chunksRef.current, { type: mimeType });
       setState("processing");
-      void (async () => {
-        let blob = base;
-        let type = mimeType;
-        let ms = durationMs;
-        if (boomerang) {
-          try {
-            const result = await createBoomerangVideo(base, durationMs / 1000);
-            blob = result.blob;
-            type = result.mimeType;
-            ms = result.durationMs;
-          } catch { /* pakai video biasa */ }
-        }
-        if (unmountedRef.current) return;
-        onComplete({ mode: "video", blob, mimeType: type, durationMs: ms, url: URL.createObjectURL(blob) });
-      })();
+      onComplete({ mode: "video", blob: base, mimeType, durationMs, url: URL.createObjectURL(base) });
     };
     startedRef.current = Date.now();
     setElapsedMs(0);
@@ -227,7 +212,7 @@ export default function VideoSession({ eventName, maxSeconds, boomerang = false,
       <GuestBackButton onClick={onBack} />
       <div className="text-center">
         <p className="max-w-[220px] truncate font-serif text-lg tracking-wide">{eventName}</p>
-        <p className="mt-1 text-[10px] uppercase tracking-[0.28em] text-[#dee6e2]/80">{boomerang ? "Boomerang" : "Video"} · maks. {limitLabel(limit)}</p>
+        <p className="mt-1 text-[10px] uppercase tracking-[0.28em] text-[#dee6e2]/80">Video · maks. {limitLabel(limit)}</p>
       </div>
       <span className="h-11 w-11" aria-hidden="true" />
     </header>
@@ -247,7 +232,7 @@ export default function VideoSession({ eventName, maxSeconds, boomerang = false,
       </div>
     </div>
     <footer className="relative z-10 shrink-0 px-5 pb-5 pt-3">
-      <p className="mb-3 text-center text-xs text-white/75">{recording ? "Ketuk tombol sekali lagi untuk berhenti" : boomerang ? "Hasilnya diputar maju-mundur · geser layar untuk ganti filter" : "Ketuk tombol untuk mulai merekam · geser layar untuk ganti filter"}</p>
+      <p className="mb-3 text-center text-xs text-white/75">{recording ? "Ketuk tombol sekali lagi untuk berhenti" : "Ketuk tombol untuk mulai merekam · geser layar untuk ganti filter"}</p>
       <div className="flex items-center justify-between">
         <button type="button" onClick={() => setFacing((value) => value === "user" ? "environment" : "user")} disabled={!ready} aria-label="Putar kamera depan atau belakang" className="flex w-20 flex-col items-center gap-1.5 text-center text-[11px] font-semibold leading-tight transition active:scale-95 disabled:opacity-40">
           <span className="grid h-12 w-12 place-items-center rounded-full border border-white/20 bg-black/45 backdrop-blur"><SwitchCamera size={20} /></span>Putar Kamera

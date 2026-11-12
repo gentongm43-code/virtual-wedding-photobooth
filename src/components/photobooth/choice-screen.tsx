@@ -30,7 +30,7 @@ function Rings() {
 export default function ChoiceScreen({ allowVideo, mode, onMode, starting, error, onBack, onNext }: Props) {
   const options = [
     { value: "photo" as const, Icon: Camera, title: "Foto", text: "Abadikan beberapa pose dengan bingkai pernikahan pilihan Anda" },
-    ...(allowVideo ? [{ value: "video" as const, Icon: Video, title: "Video", text: "Rekam video, boomerang, atau foto live dari momen terbaik Anda" }] : []),
+    ...(allowVideo ? [{ value: "video" as const, Icon: Video, title: "Video", text: "Rekam video atau foto live dari momen terbaik Anda" }] : []),
   ];
   return (
     <main className="relative min-h-[100svh] overflow-x-hidden overflow-y-auto bg-[#f1f5f3] text-[#2d3c49]">

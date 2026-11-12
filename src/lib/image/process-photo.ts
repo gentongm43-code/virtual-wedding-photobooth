@@ -11,6 +11,23 @@ import {
 import { applyPhotoFilter, normalizePhotoFilter, type PhotoFilter } from "@/lib/image/photo-filter";
 export type { PhotoArea, TemplateText } from "@/lib/image/template-config";
 
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+
+// Server (Railway) tidak punya font sistem -> teks jadi kotak. Pakai font bundel di ./fonts
+function setupFonts() {
+  try {
+    const dir = path.join(process.cwd(), "fonts");
+    if (!fs.existsSync(dir)) return;
+    const conf = path.join(os.tmpdir(), "wedding-fonts.conf");
+    const cache = path.join(os.tmpdir(), "wedding-fontcache");
+    fs.writeFileSync(conf, `<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "fonts.dtd"><fontconfig><include ignore_missing="yes">/etc/fonts/fonts.conf</include><dir>${dir}</dir><cachedir>${cache}</cachedir><alias binding="same"><family>Arial</family><prefer><family>Liberation Sans</family></prefer></alias><alias><family>sans-serif</family><prefer><family>Liberation Sans</family></prefer></alias></fontconfig>`);
+    process.env.FONTCONFIG_FILE = conf;
+  } catch {}
+}
+setupFonts();
+
 export type ProcessPhotoInput = {
   original: Buffer;
   template: TemplateConfig;
