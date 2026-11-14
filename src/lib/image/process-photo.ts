@@ -33,6 +33,8 @@ export type ProcessPhotoInput = {
   template: TemplateConfig;
   variables: { eventName: string; eventDate: string; location: string };
   photoIndex?: number;
+  /** Foto slot sebelumnya (sudah di-crop & difilter) untuk template multi-slot, urut slot 0..n-1. */
+  previousSlots?: Buffer[];
   filter?: PhotoFilter | string | null;
 };
 
@@ -64,19 +66,32 @@ async function assetBuffer(reference: string | null | undefined) {
   return null;
 }
 
-export async function processPhoto({ original, template, variables, photoIndex, filter }: ProcessPhotoInput) {
+export type ProcessedPhoto = { final: Buffer; slot: Buffer | null };
+
+export async function processPhoto(input: ProcessPhotoInput) {
+  return (await processPhotoWithSlot(input)).final;
+}
+
+export async function processPhotoWithSlot({ original, template, variables, photoIndex, previousSlots, filter }: ProcessPhotoInput): Promise<ProcessedPhoto> {
   const config = normalizeTemplate({ ...DEFAULT_TEMPLATE, ...template });
   const { width, height, photoSlots } = config;
   const photoFilter = normalizePhotoFilter(typeof filter === "string" ? filter : null);
   const rotated = sharp(original).rotate();
   const composites: OverlayOptions[] = [];
-  const area = photoSlots[Math.min(Math.max(photoIndex ?? 0, 0), photoSlots.length - 1)];
+  const slotIndex = Math.min(Math.max(photoIndex ?? 0, 0), photoSlots.length - 1);
+  const area = photoSlots[slotIndex];
+  let currentSlot: Buffer | null = null;
+  // Gambar ulang slot-slot sebelumnya supaya satu frame berisi semua foto.
+  (previousSlots ?? []).forEach((buffer, index) => {
+    const prev = photoSlots[index];
+    if (prev && index !== slotIndex) composites.push({ input: buffer, left: prev.x, top: prev.y });
+  });
   if (area) {
-    const image = await applyPhotoFilter(rotated.clone(), photoFilter)
+    currentSlot = await applyPhotoFilter(rotated.clone(), photoFilter)
       .resize(area.width, area.height, { fit: "cover", position: "centre" })
       .png()
       .toBuffer();
-    composites.push({ input: image, left: area.x, top: area.y });
+    composites.push({ input: currentSlot, left: area.x, top: area.y });
   }
   const background = await assetBuffer(config.background);
   const logo = await assetBuffer(config.logo);
@@ -117,5 +132,6 @@ export async function processPhoto({ original, template, variables, photoIndex, 
     });
   }
   const base = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#ecf0ee"/></svg>`);
-  return sharp(base).composite(composites).jpeg({ quality: 95, chromaSubsampling: "4:4:4" }).toBuffer();
+  const final = await sharp(base).composite(composites).jpeg({ quality: 95, chromaSubsampling: "4:4:4" }).toBuffer();
+  return { final, slot: currentSlot };
 }

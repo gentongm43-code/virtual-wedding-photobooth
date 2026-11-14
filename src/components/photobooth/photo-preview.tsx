@@ -29,6 +29,7 @@ export type PreviewTemplate = {
 export function PhotoPreview({
   photoUrl,
   photoUrls,
+  imageFilters,
   template,
   eventName,
   eventDate,
@@ -37,6 +38,7 @@ export function PhotoPreview({
 }: {
   photoUrl?: string;
   photoUrls?: string[];
+  imageFilters?: string[];
   template?: PreviewTemplate | null;
   eventName: string;
   eventDate: string;
@@ -51,7 +53,7 @@ export function PhotoPreview({
     {config.background && <img src={config.background} alt="" className="absolute inset-0 h-full w-full object-cover" />}
     {(photoUrls ?? (photoUrl ? [photoUrl] : [])).map((url, index) => {
       const area = photoSlots[index];
-      return area ? <img key={`${url}-${index}`} src={url} alt="" className="absolute object-cover" style={{ left: `${(area.x / width) * 100}%`, top: `${(area.y / height) * 100}%`, width: `${(area.width / width) * 100}%`, height: `${(area.height / height) * 100}%`, filter: imageFilter }} /> : null;
+      return area ? <img key={`${url}-${index}`} src={url} alt="" className="absolute object-cover" style={{ left: `${(area.x / width) * 100}%`, top: `${(area.y / height) * 100}%`, width: `${(area.width / width) * 100}%`, height: `${(area.height / height) * 100}%`, filter: imageFilters?.[index] ?? imageFilter }} /> : null;
     })}
     {config.logo && <img src={config.logo} alt="" className="absolute left-1/2 top-[1.5%] max-h-[12%] max-w-[80%] -translate-x-1/2 object-contain" />}
     <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full">

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import sharp from "sharp";
 import { prisma } from "@/lib/prisma";
-import { processPhoto } from "@/lib/image/process-photo";
-import { configFromTemplateRecord } from "@/lib/image/template-config";
+import { processPhotoWithSlot } from "@/lib/image/process-photo";
+import { configFromTemplateRecord, normalizeTemplate } from "@/lib/image/template-config";
 import { storage } from "@/lib/storage/storage";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -28,12 +28,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ eve
   const event = await prisma.event.findFirst({ where: { OR: [{ id: eventId }, { slug: eventId }], active: true }, include: { template: true } });
   const session = await prisma.guestSession.findUnique({ where: { id: sessionId } });
   if (!event || !session || session.eventId !== event.id || session.status !== "ACTIVE") return NextResponse.json({ error: "Sesi foto tidak valid." }, { status: 403 });
-  const photoCount = await prisma.photo.count({ where: { sessionId, eventId: event.id } });
-  if (photoCount >= event.photoLimit) return NextResponse.json({ error: "Batas foto untuk sesi ini sudah tercapai." }, { status: 429 });
   const input = Buffer.from(await file.arrayBuffer());
   if (contentTypeFor(input) !== file.type) return NextResponse.json({ error: "Isi file bukan gambar yang valid." }, { status: 415 });
   let originalKey: string | null = null;
   let finalKey: string | null = null;
+  let slotKey: string | null = null;
   try {
     const template = typeof templateId === "string" && templateId
       ? await prisma.template.findUnique({ where: { id: templateId } })
@@ -44,20 +43,47 @@ export async function POST(request: Request, { params }: { params: Promise<{ eve
     const metadata = await sharp(input).metadata();
     if (!metadata.width || !metadata.height) throw new Error("Invalid image dimensions.");
     const original = await sharp(input).rotate().jpeg({ quality: 90, mozjpeg: true }).toBuffer();
+    const templateConfig = template ? configFromTemplateRecord(template) : normalizeTemplate({});
+    const slotCount = templateConfig.photoSlots.length;
+    // Template multi-slot: foto berikutnya digabung ke foto sesi yang belum penuh.
+    const existing = slotCount > 1
+      ? await prisma.photo.findFirst({ where: { sessionId, eventId: event.id, slotCount }, orderBy: { createdAt: "desc" } })
+      : null;
+    const target = existing && existing.slotUrls.length > 0 && existing.slotUrls.length < slotCount ? existing : null;
+    if (!target) {
+      const photoCount = await prisma.photo.count({ where: { sessionId, eventId: event.id } });
+      if (photoCount >= event.photoLimit) return NextResponse.json({ error: "Batas foto untuk sesi ini sudah tercapai." }, { status: 429 });
+    }
+    const slotIndex = target ? target.slotUrls.length : 0;
     originalKey = event.saveOriginal ? await storage.uploadFile({ data: original, contentType: "image/jpeg", extension: "jpg" }) : null;
-    const final = await processPhoto({
+    const previousSlots = target ? await Promise.all(target.slotUrls.map((key) => storage.readFile(key))) : [];
+    const { final, slot } = await processPhotoWithSlot({
       original,
-      template:       template ? configFromTemplateRecord(template) : {},
-      photoIndex: photoCount,
+      template: templateConfig,
+      photoIndex: slotIndex,
+      previousSlots,
       filter: typeof filter === "string" ? filter : null,
       variables: { eventName: event.name, eventDate: event.date.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }), location: event.location ?? "" },
     });
     finalKey = await storage.uploadFile({ data: final, contentType: "image/jpeg", extension: "jpg" });
-    const photo = await prisma.photo.create({ data: { eventId: event.id, sessionId, originalUrl: originalKey, finalUrl: finalKey } });
+    if (slotCount > 1 && slot) slotKey = await storage.uploadFile({ data: slot, contentType: "image/png", extension: "png" });
+    let photo;
+    if (target) {
+      const oldFinal = target.finalUrl;
+      photo = await prisma.photo.update({
+        where: { id: target.id },
+        data: { finalUrl: finalKey, slotUrls: slotKey ? [...target.slotUrls, slotKey] : target.slotUrls, originalUrl: target.originalUrl ?? originalKey },
+      });
+      await storage.deleteFile(oldFinal).catch(() => undefined);
+      if (target.originalUrl && originalKey) { await storage.deleteFile(originalKey).catch(() => undefined); originalKey = null; }
+    } else {
+      photo = await prisma.photo.create({ data: { eventId: event.id, sessionId, originalUrl: originalKey, finalUrl: finalKey, slotCount, slotUrls: slotKey ? [slotKey] : [] } });
+    }
     return NextResponse.json({ id: photo.id, originalUrl: originalKey ? storage.getFileUrl(originalKey) : null, finalUrl: storage.getFileUrl(finalKey) }, { status: 201 });
   } catch (error) {
     if (originalKey) await storage.deleteFile(originalKey);
     if (finalKey) await storage.deleteFile(finalKey);
+    if (slotKey) await storage.deleteFile(slotKey);
     if (process.env.NODE_ENV === "development") console.error(error);
     return NextResponse.json({ error: "Foto gagal diproses. Silakan coba lagi." }, { status: 500 });
   }

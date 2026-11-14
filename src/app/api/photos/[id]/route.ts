@@ -8,6 +8,6 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
   const photo = await prisma.photo.findUnique({ where: { id: (await params).id } });
   if (!photo) return NextResponse.json({ error: "Foto tidak ditemukan." }, { status: 404 });
   await prisma.photo.delete({ where: { id: photo.id } });
-  await Promise.all([photo.originalUrl ? storage.deleteFile(photo.originalUrl) : Promise.resolve(), storage.deleteFile(photo.finalUrl)]);
+  await Promise.all([photo.originalUrl ? storage.deleteFile(photo.originalUrl) : Promise.resolve(), storage.deleteFile(photo.finalUrl), ...photo.slotUrls.map((key) => storage.deleteFile(key))]);
   return NextResponse.json({ ok: true });
 }
