@@ -56,7 +56,7 @@ function GuestExperience(props: GuestExperienceProps) {
   const [mainMode, setMainMode] = useState<"photo" | "video" | null>(null);
   const [selectedVideoMode, setSelectedVideoMode] = useState<VideoGuestbookMode>("normal");
   const [videoRecording, setVideoRecording] = useState<GuestMediaRecording | null>(null);
-  const [photoCount, setPhotoCount] = useState(Math.min(4, Math.max(1, props.defaultPhotoCount)));
+  const [photoCount, setPhotoCount] = useState(Math.min(6, Math.max(1, props.defaultPhotoCount)));
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [pendingPhotos, setPendingPhotos] = useState<CapturedPhoto[]>([]);
   const [selectedFrameId, setSelectedFrameId] = useState<string | null | undefined>(props.templateId ?? props.frames[0]?.id ?? null);

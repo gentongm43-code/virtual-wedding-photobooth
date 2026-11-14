@@ -177,7 +177,7 @@ export default function PhotoSession({
   const cameraRef = useRef<CameraViewHandle>(null);
   const [state, setState] = useState<SessionState>("permission");
   const [selectedPhotoCount] = useState(
-    Math.min(4, Math.max(1, selectedTemplate ? configFromTemplateRecord(selectedTemplate).photoSlots.length : defaultPhotoCount)),
+    Math.min(6, Math.max(1, selectedTemplate ? configFromTemplateRecord(selectedTemplate).photoSlots.length : defaultPhotoCount)),
   );
   const [currentPhoto, setCurrentPhoto] = useState(1);
   const [capturedPhotos, setCapturedPhotos] = useState<CapturedPhoto[]>([]);
